@@ -1,12 +1,14 @@
 package serveur;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 import client.Acheteur;
 
-public interface ServeurVente extends Remote{
+public interface ServeurVente extends Remote {
 
-	public void inscriptionAcheteur(String login, Acheteur acheteur);
-	public int rencherir(int nouveauPrix, Acheteur acheteur);
-	public int tempsEcoule(Acheteur acheteur);
+	public void inscriptionAcheteur(String login, Acheteur acheteur) throws RemoteException;
+	public int rencherir(int nouveauPrix, Acheteur acheteur) throws RemoteException;
+	public int tempsEcoule(Acheteur acheteur) throws RemoteException;
+
 }

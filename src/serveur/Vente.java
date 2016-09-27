@@ -19,6 +19,20 @@ public class Vente extends UnicastRemoteObject implements ServeurVente{
 	 */
 	private static final long serialVersionUID = 1L;
 	private List<Acheteur> listeAcheteurs = new ArrayList<Acheteur>();
+	
+	
+
+	public List<Acheteur> getListeAcheteurs() {
+		return listeAcheteurs;
+	}
+
+	public void setListeAcheteurs(List<Acheteur> listeAcheteurs) {
+		this.listeAcheteurs = listeAcheteurs;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	@Override
 	public void inscriptionAcheteur(String login, Acheteur acheteur) {

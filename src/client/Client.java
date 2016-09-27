@@ -48,7 +48,7 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	}
 
 	@Override
-	public void nouveauPrix(int prix) {
+	public void nouveauPrix(int prix) throws RemoteException {
 		serveur.rencherir(prix, this);
 	}
 	
