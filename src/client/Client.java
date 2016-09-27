@@ -1,36 +1,55 @@
 package client;
 
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Client  extends UnicastRemoteObject  implements Acheteur{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-
-	protected Client() throws RemoteException {
+	private ServeurVente serveur;
+	private String pseudo;
+	private EtatClient etat;
+	private long chrono;
+	
+	protected Client(String pseudo) throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
+		serveur = (ServeurVente) Naming.lookup("//e103c04.ifsic.univ-rennes1.fr:8090/additionneur");
+		serveur.nvlAcheteur(pseudo, this);
+		this.pseudo = pseudo;
+		etat = EtatClient.attente;
+		// chrono = ?
 	}
 
 	@Override
 	public void nouvelleSoumission(String objet, int prix) {
-		// TODO Auto-generated method stub
+		try {
+			//serveur.addObjet(objet, prix);
+		}
+		catch(Exception e){
+			System.out.println("erreur");
+		}
 		
 	}
 
 	@Override
 	public void objetVendu() {
-		// TODO Auto-generated method stub
+		etat = EtatClient.vendu;
 		
 	}
 
 	@Override
 	public void nouveauPrix(int prix) {
-		// TODO Auto-generated method stub
-		
+		serveur.rencherir(prix, this);
+	}
+	
+	public static void main(String[] argv){
+		try {
+			ServeurVente c = (ServeurVente) Naming.lookup("//e103c04.ifsic.univ-rennes1.fr:8090/additionneur");
+		}
+		catch(Exception e){
+			System.out.println("erreur");
+		}
 	}
 
 }
