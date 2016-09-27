@@ -19,9 +19,8 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	protected Client(String pseudo) throws RemoteException {
 		super();
 		try {
-			serveur = (ServeurVente) Naming.lookup("//e103c04.ifsic.univ-rennes1.fr:8090/additionneur");
+			serveur = (ServeurVente) Naming.lookup("//172.16.134.156:8090/enchere");
 		} catch (MalformedURLException | NotBoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		serveur.inscriptionAcheteur(pseudo, this);
@@ -31,7 +30,7 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	}
 
 	@Override
-	public void nouvelleSoumission(String objet, int prix) {
+	public void nouvelleSoumission(String objet, int prix)  throws RemoteException {
 		try {
 			//serveur.addObjet(objet, prix);
 		}
@@ -42,22 +41,22 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	}
 
 	@Override
-	public void objetVendu() {
+	public void objetVendu() throws RemoteException{
 		etat = EtatClient.vendu;
 		
 	}
 
 	@Override
-	public void nouveauPrix(int prix) {
+	public void nouveauPrix(int prix)throws RemoteException {
 		serveur.rencherir(prix, this);
 	}
 	
 	public static void main(String[] argv){
 		try {
-			ServeurVente c = (ServeurVente) Naming.lookup("//e103c04.ifsic.univ-rennes1.fr:8090/additionneur");
-		}
-		catch(Exception e){
-			System.out.println("erreur");
+			Client c = new Client("toto");
+			System.out.println("Test");
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
 	}
 
