@@ -24,22 +24,6 @@ public class Serveur{
 	
 	
 	
-	
-	
-	public void inscriptionAcheteur(String login, InterfaceAcheteur acheteur) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public int rencherir(int nouveauPrix, InterfaceAcheteur acheteur) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int tempsEcoule(InterfaceAcheteur acheteur) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	
 	

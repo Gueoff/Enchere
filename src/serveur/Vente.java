@@ -5,6 +5,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import client.Acheteur;
+
 public class Vente extends UnicastRemoteObject implements ServeurVente{
 	
 	protected Vente() throws RemoteException {
@@ -16,22 +18,22 @@ public class Vente extends UnicastRemoteObject implements ServeurVente{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private List<InterfaceAcheteur> listeAcheteurs = new ArrayList<InterfaceAcheteur>();
+	private List<Acheteur> listeAcheteurs = new ArrayList<Acheteur>();
 
 	@Override
-	public void inscriptionAcheteur(String login, InterfaceAcheteur acheteur) {
+	public void inscriptionAcheteur(String login, Acheteur acheteur) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public int rencherir(int nouveauPrix, InterfaceAcheteur acheteur) {
+	public int rencherir(int nouveauPrix, Acheteur acheteur) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
-	public int tempsEcoule(InterfaceAcheteur acheteur) {
+	public int tempsEcoule(Acheteur acheteur) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

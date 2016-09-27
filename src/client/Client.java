@@ -1,8 +1,12 @@
 package client;
 
+import java.net.MalformedURLException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+
+import serveur.ServeurVente;
 
 public class Client  extends UnicastRemoteObject  implements Acheteur{
 
@@ -14,8 +18,13 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	
 	protected Client(String pseudo) throws RemoteException {
 		super();
-		serveur = (ServeurVente) Naming.lookup("//e103c04.ifsic.univ-rennes1.fr:8090/additionneur");
-		serveur.nvlAcheteur(pseudo, this);
+		try {
+			serveur = (ServeurVente) Naming.lookup("//e103c04.ifsic.univ-rennes1.fr:8090/additionneur");
+		} catch (MalformedURLException | NotBoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		serveur.inscriptionAcheteur(pseudo, this);
 		this.pseudo = pseudo;
 		etat = EtatClient.attente;
 		// chrono = ?
