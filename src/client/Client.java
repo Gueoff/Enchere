@@ -32,6 +32,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		}
 	}
 
+	@Override
 	public String getPseudo() {
 		return pseudo;
 	}
