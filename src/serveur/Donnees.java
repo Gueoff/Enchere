@@ -28,6 +28,8 @@ public class Donnees {
 		this.listeObjets = listeObjets;
 	}
 
+	
+	
 	public void initObjets(){
 		Objet obj1 = new Objet("jarre","jarre de ramses 3", 250);
 		Objet obj2 = new Objet("herisson","herisson des bois", 100);
@@ -35,6 +37,8 @@ public class Donnees {
 		listeObjets.add(obj1);
 		listeObjets.add(obj2);
 	}
+	
+	
 	
 	public void inscription(String login, Acheteur acheteur) throws Exception{
 		
@@ -49,5 +53,11 @@ public class Donnees {
 		
 		listeAcheteurs.add(acheteur);
 		
+	}
+	
+	
+	
+	public void ajoutObjet(Objet objet){
+		this.listeObjets.add(objet);
 	}
 }

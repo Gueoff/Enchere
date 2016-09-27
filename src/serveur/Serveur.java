@@ -20,10 +20,7 @@ public class Serveur{
 		bdd.initObjets();
 		
 		
-		
 		try {	
-			
-			
 			
 		for(Objet each : bdd.getListeObjets()){
 			salonsVente.add(new Vente(new ArrayList<Acheteur>(), each));
@@ -35,9 +32,7 @@ public class Serveur{
 			//Vente salonVente = new Vente();
 			Naming.bind("//localhost:8090/enchere", salonsVente.get(0)); // //host:port/name
 			
-			
-			
-	
+
 	
 		while(true){
 			
@@ -48,6 +43,7 @@ public class Serveur{
 			
 			t.sleep(2000);
 			System.out.println(salonsVente.get(0).getEtatVente());
+			System.out.println(salonsVente.get(0).getObjet().getPrixCourant());
 		
 		}
 	

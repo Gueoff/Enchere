@@ -75,14 +75,5 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 		}
 	}
 
-<<<<<<< HEAD
-	@Override
-	public String getPseudo() {
-		// TODO Auto-generated method stub
-		return this.pseudo;
-	}
-=======
-
->>>>>>> 79c3e087b45434770ebc12658dd38977bc0e620d
 
 }
