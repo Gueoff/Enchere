@@ -1,16 +1,16 @@
 package client;
 
-import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import serveur.Objet;
 import serveur.ServeurVente;
 
-public class Client  extends UnicastRemoteObject  implements Acheteur{
+public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
+	private static final String adresseServeur = "172.16.134.156:8090/enchere";
 	private ServeurVente serveur;
 	private String pseudo;
 	private EtatClient etat;
@@ -19,15 +19,16 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	protected Client(String pseudo) throws RemoteException {
 		super();
 		this.pseudo = pseudo;
-		etat = EtatClient.attente;
+		etat = EtatClient.ATTENTE;
 		chrono = new Chrono(60000); // Chrono d'1min
 		
-		// Initialisation du serveur
+		// Connexion au serveur
 		try {
-			serveur = (ServeurVente) Naming.lookup("//172.16.134.156:8090/enchere");
+			serveur = (ServeurVente) Naming.lookup("//" + adresseServeur);
 			serveur.inscriptionAcheteur(pseudo, this);
+			System.out.println("Connexion au serveur " + adresseServeur + " réussi. " + pseudo + " est ajouté à la liste d'acheteurs.");
 		} catch (Exception e) {
-			System.out.println("Connexion au serveur " + "172.16.134.156:8090/enchere" + " refusé.");
+			System.out.println("Connexion au serveur " + adresseServeur + " impossible.");
 		}
 	}
 
@@ -36,27 +37,21 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 	}
 	
 	@Override
-	public void nouvelleSoumission(String objet, int prix) throws RemoteException {
-		try {
-			//serveur.addObjet(objet, prix);
-		}
-		catch(Exception e){
-			System.out.println("erreur");
-		}
-		
+	public void nouvelleSoumission(String nom, String description, int prix) throws RemoteException {
+		//serveur.addObjet(new Objet(nom, description, prix));
 	}
 
 	@Override
 	public void objetVendu() throws RemoteException{
-		etat = EtatClient.vendu;
+		etat = EtatClient.TERMINE;
 		chrono.start();
 	}
 
 	@Override
 	public void nouveauPrix(int prix) throws RemoteException {
-		if(!chrono.getFini() & etat != EtatClient.attente) {
+		if(!chrono.getFini() & etat != EtatClient.ATTENTE) {
 			serveur.rencherir(prix, this);
-			etat = EtatClient.rencherir;
+			etat = EtatClient.RENCHERI;
 		}
 	}
 	
@@ -74,7 +69,5 @@ public class Client  extends UnicastRemoteObject  implements Acheteur{
 			e.printStackTrace();
 		}
 	}
-
-
 
 }
