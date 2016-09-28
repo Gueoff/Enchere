@@ -29,7 +29,7 @@ public class Donnees {
 	}
 
 	
-	
+	//TODO a virer par la suite
 	public void initObjets(){
 		Objet obj1 = new Objet("jarre","jarre de ramses 3", 250);
 		Objet obj2 = new Objet("herisson","herisson des bois", 100);
@@ -40,6 +40,12 @@ public class Donnees {
 	
 	
 	
+	/**
+	 * Methode permettant a un client de s'inscrire. Ajoute le client dans la liste des acheteurs.
+	 * @param login
+	 * @param acheteur
+	 * @throws Exception
+	 */
 	public void inscription(String login, Acheteur acheteur) throws Exception{
 		
 		for(Acheteur each : listeAcheteurs){
@@ -56,8 +62,26 @@ public class Donnees {
 	}
 	
 	
-	
-	public void ajoutObjet(Objet objet){
-		this.listeObjets.add(objet);
+	/**
+	 * Methode permettant l'ajout d'un nouvel objet aux enchere. Ajoute l'objet dans la liste des objets a vendre.
+	 * @param objet l'objet a vendre.
+	 * @param acheteur le client voulant deposer l'objet.
+	 * @throws Exception so l'objet est deja en vente ou si l'acheteur n'est pas encore inscrit.
+	 */
+	public void ajouterArticle(Objet objet, Acheteur acheteur) throws Exception{
+		for(Objet each : this.listeObjets){
+			if(each.equals(objet)){
+				throw new Exception("Objet deja existant");
+			}
+		}
+		for(Acheteur each : this.listeAcheteurs){
+			if(each.equals(acheteur)){
+				this.listeObjets.add(objet);
+			}
+		}
+		throw new Exception("L'acheteur voulant ajouter un objet n'est pas encore inscrit");
+		
 	}
+	
+	
 }

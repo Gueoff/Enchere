@@ -28,9 +28,6 @@ public class Vente extends UnicastRemoteObject implements ServeurVente{
 		this.etatVente = EtatVente.attente;
 	}
 
-	
-
-	
 
 	public List<Acheteur> getListeAcheteurs() {
 		return listeAcheteurs;
@@ -42,7 +39,6 @@ public class Vente extends UnicastRemoteObject implements ServeurVente{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
-		
 	}
 
 	public Objet getObjet() {
@@ -70,26 +66,29 @@ public class Vente extends UnicastRemoteObject implements ServeurVente{
 		this.etatVente = etatVente;
 	}
 
+	
 	@Override
 	public void inscriptionAcheteur(String login, Acheteur acheteur) {
 		for(Acheteur each : listeAcheteurs){
 			if(each.getPseudo().equals(login) || each.getPseudo().equals(acheteur.getPseudo())){
-				System.out.println("user deja pris");
+				new Exception("Login deja pris");
 			}
+		}
+		if(this.etatVente.equals(EtatVente.termine) || this.etatVente.equals(EtatVente.encherissement)){
+			new Exception("La vente ne peut pas etre rejointe");
 		}
 		
 		listeAcheteurs.add(acheteur);
-		
 	}
 
 	@Override
-	public int rencherir(int nouveauPrix, Acheteur acheteur) {
+	public synchronized int rencherir(int nouveauPrix, Acheteur acheteur) {
 		if(this.objet.getPrixCourant() < nouveauPrix){
 			this.objet.setPrixCourant(nouveauPrix);
 			this.acheteurCourant = acheteur;
 		}
 		else{
-			System.out.println("prix non valide");
+			new Exception("Prix non valide");
 		}
 		
 		return nouveauPrix;
@@ -98,9 +97,11 @@ public class Vente extends UnicastRemoteObject implements ServeurVente{
 	
 	
 	@Override
-	public int tempsEcoule(Acheteur acheteur) {
+	public synchronized int tempsEcoule(Acheteur acheteur) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+
 
 }
