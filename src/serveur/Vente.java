@@ -1,107 +1,35 @@
 package serveur;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.List;
 
 import client.Acheteur;
 
-public class Vente extends UnicastRemoteObject implements ServeurVente{
+public interface Vente extends Remote {
+
+	/**
+	 * Methode servant a inscrire un acheteur a une vente. Ajoute l'acheteur dans la liste des acheteurs
+	 * @param login 
+	 * @param acheteur
+	 * @throws RemoteException
+	 */
+	public void inscriptionAcheteur(String login, Acheteur acheteur) throws RemoteException, Exception;
 	
-	private static final long serialVersionUID = 1L;
-	private List<Acheteur> listeAcheteurs = new ArrayList<Acheteur>();
-	private Objet objet;
-	private Acheteur acheteurCourant;
-	private EtatVente etatVente;
+	/**
+	 * Augmente le prix de l'objet a vendre.
+	 * @param nouveauPrix le nouveau prix que le client a donne
+	 * @param acheteur l'acheteur ayant encherit 
+	 * @return le nouveau prix de l'objet a vendre
+	 * @throws RemoteException
+	 */
+	public int rencherir(int nouveauPrix, Acheteur acheteur) throws RemoteException, Exception;
 	
-	
-	protected Vente() throws RemoteException {
-		super();
-	}
-	
-	public Vente(List<Acheteur> listeAcheteurs, Objet objet)
-			throws RemoteException {
-		super();
-		this.listeAcheteurs = listeAcheteurs;
-		this.objet = objet;
-		this.etatVente = EtatVente.attente;
-	}
-
-
-	public List<Acheteur> getListeAcheteurs() {
-		return listeAcheteurs;
-	}
-
-	public void setListeAcheteurs(List<Acheteur> listeAcheteurs) {
-		this.listeAcheteurs = listeAcheteurs;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	public Objet getObjet() {
-		return objet;
-	}
-
-	public void setObjet(Objet objet) {
-		this.objet = objet;
-	}
-
-	public Acheteur getAcheteurCourant() {
-		return acheteurCourant;
-	}
-
-	public void setAcheteurCourant(Acheteur acheteurCourant) {
-		this.acheteurCourant = acheteurCourant;
-	}
-	
-
-	public EtatVente getEtatVente() {
-		return etatVente;
-	}
-
-	public void setEtatVente(EtatVente etatVente) {
-		this.etatVente = etatVente;
-	}
-
-	
-	@Override
-	public void inscriptionAcheteur(String login, Acheteur acheteur) {
-		for(Acheteur each : listeAcheteurs){
-			if(each.getPseudo().equals(login) || each.getPseudo().equals(acheteur.getPseudo())){
-				new Exception("Login deja pris");
-			}
-		}
-		if(this.etatVente.equals(EtatVente.termine) || this.etatVente.equals(EtatVente.encherissement)){
-			new Exception("La vente ne peut pas etre rejointe");
-		}
-		
-		listeAcheteurs.add(acheteur);
-	}
-
-	@Override
-	public synchronized int rencherir(int nouveauPrix, Acheteur acheteur) {
-		if(this.objet.getPrixCourant() < nouveauPrix){
-			this.objet.setPrixCourant(nouveauPrix);
-			this.acheteurCourant = acheteur;
-		}
-		else{
-			new Exception("Prix non valide");
-		}
-		
-		return nouveauPrix;
-	}
-
-	
-	
-	@Override
-	public synchronized int tempsEcoule(Acheteur acheteur) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
+	/**
+	 * je sais pas
+	 * @param acheteur
+	 * @return
+	 * @throws RemoteException
+	 */
+	public int tempsEcoule(Acheteur acheteur) throws RemoteException, Exception;
 
 }

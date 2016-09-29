@@ -1,11 +1,12 @@
 package serveur;
 
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.ArrayList;
-import java.util.List;
-
-import client.Acheteur;
 
 
 public class Serveur{
@@ -14,45 +15,48 @@ public class Serveur{
 
 	public static void main(String[] argv) {
 		
-		List<Vente> salonsVente = new ArrayList<Vente>();
-		Thread t = new Thread();
-		Donnees bdd = new Donnees();
-		bdd.initObjets();
 		
-		
-		try {	
+		try {
 			
-		for(Objet each : bdd.getListeObjets()){
-			salonsVente.add(new Vente(new ArrayList<Acheteur>(), each));
-			
-		}
-		
-		
-			LocateRegistry.createRegistry(8090);
-			//Vente salonVente = new Vente();
-			Naming.bind("//localhost:8090/enchere", salonsVente.get(0)); // //host:port/name
-			
-
-	
-		while(true){
-			
-			if(salonsVente.get(0).getListeAcheteurs().size() >= 1){
-				salonsVente.get(0).setEtatVente(EtatVente.encherissement);
+			//Securite pour l acces distant
+			LocateRegistry.createRegistry(8090);		 
+			if (System.getSecurityManager() == null) {
+				System.setSecurityManager(new RMISecurityManager());
 			}
 			
+			//Creation de l objet distant
+			VenteImpl vente = new VenteImpl();
+			String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + "/Enchere";
+			Naming.rebind(url, vente);
+			//Naming.bind("//localhost:8090/enchere", vente); // //host:port/name
 			
-			t.sleep(2000);
-			System.out.println(salonsVente.get(0).getEtatVente());
-			System.out.println(salonsVente.get(0).getObjet().getPrixCourant());
-		
-		}
-	
-	
-		}
-		
-		catch(Exception e) { 
-			System.out.println(e.getMessage());
+			
+			
+			Thread t = new Thread();
+			
+			while(true){
+				
+				
+				
+				t.sleep(2000);
+				System.out.println(vente.getEtatVente());
+				System.out.println(vente.getObjet().getPrixCourant());
+			
 			}
-
-	}}
+			
+				
+			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+	}	
+}
 	

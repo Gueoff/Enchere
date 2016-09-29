@@ -5,13 +5,13 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import serveur.Objet;
-import serveur.ServeurVente;
+import serveur.Vente;
 
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
 	private static final String adresseServeur = "172.16.134.156:8090/enchere";
-	private ServeurVente serveur;
+	private Vente serveur;
 	private String pseudo;
 	private EtatClient etat;
 	private Chrono chrono;
@@ -24,7 +24,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		
 		// Connexion au serveur
 		try {
-			serveur = (ServeurVente) Naming.lookup("//" + adresseServeur);
+			serveur = (Vente) Naming.lookup("//" + adresseServeur);
 			serveur.inscriptionAcheteur(pseudo, this);
 			System.out.println("Connexion au serveur " + adresseServeur + " réussi. " + pseudo + " est ajouté à la liste d'acheteurs.");
 		} catch (Exception e) {
@@ -49,7 +49,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 
 	@Override
-	public void nouveauPrix(int prix) throws RemoteException {
+	public void nouveauPrix(int prix) throws RemoteException, Exception {
 		if(!chrono.getFini() & etat != EtatClient.ATTENTE) {
 			serveur.rencherir(prix, this);
 			etat = EtatClient.RENCHERI;

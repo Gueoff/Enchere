@@ -74,7 +74,7 @@ public class VueClient extends JFrame implements ActionListener{
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {	
+	public synchronized void actionPerformed(ActionEvent arg0) {	
 		if(arg0.getSource().equals(this.bouton)){
 			if(this.objet.getPrixCourant() < Integer.parseInt(this.nouveauPrix.getText())){
 				//TODO appeler encherir
