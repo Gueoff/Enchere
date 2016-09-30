@@ -1,5 +1,6 @@
 package serveur;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class Donnees {
 		
 	}
 	
-	public boolean estInscrit(String login){
+	public boolean estInscrit(String login) throws RemoteException{
 		for (Acheteur each : listeAcheteurs){
 			if(each.getPseudo().equals(login)){
 				return true;

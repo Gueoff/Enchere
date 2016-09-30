@@ -11,7 +11,7 @@ import serveur.Vente;
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
-	private static final String adresseServeur = "172.16.134.156:8090/enchere";
+	private static final String adresseServeur = "172.16.134.145:8090/enchere";
 	private Vente serveur;
 	private String pseudo;
 	private EtatClient etat;
@@ -32,7 +32,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	public Client(String pseudo) throws Exception {
 		super();
 		this.pseudo = pseudo;
-		this.serveur = connexionServeur();
+		this.serveur = Client.connexionServeur();
 		etat = EtatClient.ATTENTE;
 		chrono = new Chrono(60000); // Chrono d'1min
 		
@@ -49,6 +49,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			return serveur;
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Connexion au serveur " + adresseServeur + " impossible.");
 			return null;
 		}
@@ -63,7 +64,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 	
 	@Override
-	public String getPseudo() {
+	public String getPseudo() throws RemoteException {
 		return pseudo;
 	}
 	
