@@ -38,6 +38,7 @@ public class VueClient extends JFrame implements ActionListener{
 	private JTextField txtPseudo = new JTextField();
 
 	
+
 	public VueClient() throws Exception {
 		super();
 		
@@ -90,11 +91,24 @@ public class VueClient extends JFrame implements ActionListener{
 	public synchronized void actionPerformed(ActionEvent arg0) {	
 		// ENCHERIR			
 		if(arg0.getSource().equals(this.btnEncherir)){
-			if(this.currentObjet.getPrixCourant() < Integer.parseInt(this.txtPrix.getText())){
-				//TODO appeler encherir
-				System.out.println("ok");
+
+			System.out.println("click");
+			if(!txtPrix.getText().isEmpty()){
+				if((currentObjet.getPrixCourant() < Integer.parseInt(txtPrix.getText()))&&(Integer.parseInt(txtPrix.getText())>0)){
+					try {
+						currentClient.nouveauPrix(this.currentObjet.getPrixCourant());
+					} catch (RemoteException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
-		}
+
+			}
+		
 		
 		// INSCRIPTION
 		else if(arg0.getSource().equals(btnInscription)) {
@@ -106,7 +120,9 @@ public class VueClient extends JFrame implements ActionListener{
 		}
 	}
 	
+
 	public static void main(String[] args) throws Exception {
 		JFrame frame = new VueClient();
 	}
+
 }
