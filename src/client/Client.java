@@ -7,6 +7,7 @@ import java.rmi.server.UnicastRemoteObject;
 import serveur.Objet;
 import serveur.Vente;
 
+
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
@@ -16,23 +17,55 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	private EtatClient etat;
 	private Chrono chrono;
 	
-	public Client(String pseudo) throws RemoteException {
+
+	public Client(String pseudo, Vente serveur) throws Exception {
 		super();
 		this.pseudo = pseudo;
-		this.etat = EtatClient.ATTENTE;
-		this.chrono = new Chrono(60000); // Chrono d'1min
+		this.serveur = serveur;
+		etat = EtatClient.ATTENTE;
+		chrono = new Chrono(60000); // Chrono d'1min
 		
-		// Connexion au serveur
+		// Inscription
+		serveur.inscriptionAcheteur(pseudo, this);
+		System.out.println(pseudo + " est ajouté à la liste d'acheteurs.");
+	}
+	
+	public Client(String pseudo) throws Exception {
+		super();
+		this.pseudo = pseudo;
+		this.serveur = connexionServeur();
+		etat = EtatClient.ATTENTE;
+		chrono = new Chrono(60000); // Chrono d'1min
+		
+		// Inscription
+		//serveur.inscriptionAcheteur(pseudo, this);
+		//System.out.println(pseudo + " est ajouté à la liste d'acheteurs.");
+	}
+
+	public static Vente connexionServeur() {
 		try {
-			serveur = (Vente) Naming.lookup("//" + adresseServeur);
-			serveur.inscriptionAcheteur(pseudo, this);
-			System.out.println("Connexion au serveur " + adresseServeur + " réussi. " + pseudo + " est ajouté à la liste d'acheteurs.");
+
+			Vente serveur = (Vente) Naming.lookup("//" + adresseServeur);
+			System.out.println("Connexion au serveur " + adresseServeur + " réussi. ");
+			return serveur;
+
 		} catch (Exception e) {
 			System.out.println("Connexion au serveur " + adresseServeur + " impossible.");
+
 			e.printStackTrace();
+
+			return null;
 		}
 	}
 
+	public Vente getServeur() {
+		return serveur;
+	}
+
+	public void setServeur(Vente serveur) {
+		this.serveur = serveur;
+	}
+	
 	@Override
 	public String getPseudo() throws RemoteException{
 		return pseudo;
@@ -65,6 +98,24 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	public void setChrono(Chrono chrono) {
 		this.chrono = chrono;
+	}
+	
+	public static void main(String[] argv) throws Exception{
+		try {
+			Client c = new Client("toto");
+			
+			
+			c.objetVendu();
+			int cpt = 0;
+			while(true) {
+				System.out.println( cpt + " " + c.chrono.getFini());
+				Thread.sleep(1000);
+				cpt++;
+			}
+		} catch (RemoteException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }

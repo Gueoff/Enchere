@@ -61,6 +61,15 @@ public class Donnees {
 		
 	}
 	
+	public boolean estInscrit(String login){
+		for (Acheteur each : listeAcheteurs){
+			if(each.getPseudo().equals(login)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	
 	/**
 	 * Methode permettant l'ajout d'un nouvel objet aux enchere. Ajoute l'objet dans la liste des objets a vendre.
