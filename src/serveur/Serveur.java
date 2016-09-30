@@ -40,10 +40,8 @@ public class Serveur{
 				System.setSecurityManager(new RMISecurityManager());
 			}
 			*/
-			
 
-
-		
+		Naming.bind("//localhost:"+port+"/enchere", vente); // //host:port/name
 
 			
 
