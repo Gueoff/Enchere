@@ -3,6 +3,7 @@ package serveur;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
@@ -13,13 +14,13 @@ public class Serveur{
 
 	
 
-	public static void main(String[] argv) {
+	public static void main(String[] argv) throws AlreadyBoundException {
 		
 		
 		try {
-			
+			int port = 2202;
 			//Securite pour l acces distant
-			LocateRegistry.createRegistry(8090);		 
+			LocateRegistry.createRegistry(port);		 
 			if (System.getSecurityManager() == null) {
 				System.setSecurityManager(new RMISecurityManager());
 			}
@@ -27,8 +28,8 @@ public class Serveur{
 			//Creation de l objet distant
 			VenteImpl vente = new VenteImpl();
 			String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + "/Enchere";
-			Naming.rebind(url, vente);
-			//Naming.bind("//localhost:8090/enchere", vente); // //host:port/name
+			//Naming.rebind(url, vente);
+			Naming.bind("//172.16.134.146:"+port+"/enchere", vente); // //host:port/name
 			
 			
 			
