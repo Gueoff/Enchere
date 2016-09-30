@@ -33,7 +33,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	public Client(String pseudo) throws Exception {
 		super();
 		this.pseudo = pseudo;
-		this.serveur = connexionServeur();
+		this.serveur = Client.connexionServeur();
 		etat = EtatClient.ATTENTE;
 		chrono = new Chrono(60000); // Chrono d'1min
 		
@@ -50,6 +50,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			return serveur;
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Connexion au serveur " + adresseServeur + " impossible.");
 
 			e.printStackTrace();
@@ -67,7 +68,8 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 	
 	@Override
-	public String getPseudo() throws RemoteException{
+	public String getPseudo() throws RemoteException {
+
 		return pseudo;
 	}
 	
