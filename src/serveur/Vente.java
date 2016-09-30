@@ -32,6 +32,8 @@ public interface Vente extends Remote {
 	 */
 	public int tempsEcoule(Acheteur acheteur) throws RemoteException, Exception;
 	
+
 	public Objet getObjet() throws RemoteException;
+
 
 }

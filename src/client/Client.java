@@ -5,33 +5,63 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import serveur.Objet;
-import serveur.VenteImpl;
+import serveur.Vente;
+
 
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
 	private static final String adresseServeur = "172.16.134.156:8090/enchere";
-	private VenteImpl serveur;
+	private Vente serveur;
 	private String pseudo;
 	private EtatClient etat;
 	private Chrono chrono;
 	
-	protected Client(String pseudo) throws RemoteException {
+	public Client(String pseudo, Vente serveur) throws Exception {
 		super();
 		this.pseudo = pseudo;
+		this.serveur = serveur;
 		etat = EtatClient.ATTENTE;
 		chrono = new Chrono(60000); // Chrono d'1min
 		
-		// Connexion au serveur
+		// Inscription
+		serveur.inscriptionAcheteur(pseudo, this);
+		System.out.println(pseudo + " est ajouté à la liste d'acheteurs.");
+	}
+	
+	public Client(String pseudo) throws Exception {
+		super();
+		this.pseudo = pseudo;
+		this.serveur = connexionServeur();
+		etat = EtatClient.ATTENTE;
+		chrono = new Chrono(60000); // Chrono d'1min
+		
+		// Inscription
+		serveur.inscriptionAcheteur(pseudo, this);
+		System.out.println(pseudo + " est ajouté à la liste d'acheteurs.");
+	}
+
+	public static Vente connexionServeur() {
 		try {
-			serveur = (VenteImpl) Naming.lookup("//" + adresseServeur);
-			serveur.inscriptionAcheteur(pseudo, this);
-			System.out.println("Connexion au serveur " + adresseServeur + " réussi. " + pseudo + " est ajouté à la liste d'acheteurs.");
+
+			Vente serveur = (Vente) Naming.lookup("//" + adresseServeur);
+			System.out.println("Connexion au serveur " + adresseServeur + " réussi. ");
+			return serveur;
+
 		} catch (Exception e) {
 			System.out.println("Connexion au serveur " + adresseServeur + " impossible.");
+			return null;
 		}
 	}
 
+	public Vente getServeur() {
+		return serveur;
+	}
+
+	public void setServeur(Vente serveur) {
+		this.serveur = serveur;
+	}
+	
 	@Override
 	public String getPseudo() {
 		return pseudo;
@@ -56,7 +86,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		}
 	}
 	
-	public static void main(String[] argv){
+	public static void main(String[] argv) throws Exception{
 		try {
 			Client c = new Client("toto");
 			c.objetVendu();
