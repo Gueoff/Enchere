@@ -10,17 +10,17 @@ import serveur.Vente;
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
-	private static final String adresseServeur = "172.16.134.156:8090/enchere";
+	private static final String adresseServeur = "172.16.134.145:8090/enchere";
 	private Vente serveur;
 	private String pseudo;
 	private EtatClient etat;
 	private Chrono chrono;
 	
-	protected Client(String pseudo) throws RemoteException {
+	public Client(String pseudo) throws RemoteException {
 		super();
 		this.pseudo = pseudo;
-		etat = EtatClient.ATTENTE;
-		chrono = new Chrono(60000); // Chrono d'1min
+		this.etat = EtatClient.ATTENTE;
+		this.chrono = new Chrono(60000); // Chrono d'1min
 		
 		// Connexion au serveur
 		try {
@@ -29,11 +29,12 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			System.out.println("Connexion au serveur " + adresseServeur + " réussi. " + pseudo + " est ajouté à la liste d'acheteurs.");
 		} catch (Exception e) {
 			System.out.println("Connexion au serveur " + adresseServeur + " impossible.");
+			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public String getPseudo() {
+	public String getPseudo() throws RemoteException{
 		return pseudo;
 	}
 	
@@ -53,22 +54,17 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		if(!chrono.getFini() & etat != EtatClient.ATTENTE) {
 			serveur.rencherir(prix, this);
 			etat = EtatClient.RENCHERI;
+			System.out.println("Vous avez tente de rencherir de " + prix +"euros.");
 		}
 	}
 	
-	public static void main(String[] argv){
-		try {
-			Client c = new Client("toto");
-			c.objetVendu();
-			int cpt = 0;
-			while(true) {
-				System.out.println( cpt + " " + c.chrono.getFini());
-				Thread.sleep(1000);
-				cpt++;
-			}
-		} catch (RemoteException | InterruptedException e) {
-			e.printStackTrace();
-		}
+
+	public Chrono getChrono() {
+		return chrono;
+	}
+
+	public void setChrono(Chrono chrono) {
+		this.chrono = chrono;
 	}
 
 }
