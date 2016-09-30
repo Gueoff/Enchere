@@ -28,6 +28,8 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		this.listeAcheteurs = listeAcheteurs;
 		this.objet = objet;
 		this.etatVente = EtatVente.ATTENTE;
+		this.donnees = new Donnees();
+		donnees.initObjets();
 	}
 
 
@@ -81,13 +83,12 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		if(this.etatVente.equals(EtatVente.TERMINE) || this.etatVente.equals(EtatVente.ENCHERISSEMENT)){
 			throw new Exception("La vente ne peut pas etre rejointe");
 		}
-		if(this.listeAcheteurs.size() >= 2 && this.etatVente.equals(EtatVente.ATTENTE)){
+		if(this.listeAcheteurs.size() >= 1 && this.etatVente.equals(EtatVente.ATTENTE)){
 			this.etatVente = EtatVente.ENCHERISSEMENT;
 		}
 		if (!donnees.estInscrit(login)){
 			donnees.inscription(login, acheteur);
 		}
-		
 		listeAcheteurs.add(acheteur);
 		
 	}

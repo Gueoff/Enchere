@@ -41,7 +41,6 @@ public class Serveur{
 			}
 			*/
 
-		Naming.bind("//localhost:"+port+"/enchere", vente); // //host:port/name
 
 			
 
@@ -49,6 +48,7 @@ public class Serveur{
 		while(true){
 			
 			Thread.sleep(2000);
+			System.out.println(vente.getListeAcheteurs().size());
 			System.out.println(vente.getEtatVente());
 			System.out.println(vente.getObjet().getPrixCourant());
 		
