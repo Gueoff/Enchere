@@ -1,7 +1,10 @@
 package serveur;
 
-public class Objet {
+import java.io.Serializable;
 
+public class Objet implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private String nom;
 	private String description;
 	private int prixBase;

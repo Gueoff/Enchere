@@ -51,10 +51,10 @@ public class Donnees {
 		
 		for(Acheteur each : listeAcheteurs){
 			if(each.getPseudo().equals(login)){
-				throw new Exception("Ce nom est déjà utilisé par un autre acheteur");
+				throw new Exception("Ce nom est deja� utilise par un autre acheteur");
 			}
 			if(each.getPseudo().equals(acheteur.getPseudo())){
-				throw new Exception("Ce nom est déjà utilisé par un autre acheteur");
+				throw new Exception("Ce nom est deja� utilise par un autre acheteur");
 			}
 		}
 		

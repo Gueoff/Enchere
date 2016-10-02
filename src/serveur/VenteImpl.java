@@ -8,7 +8,6 @@ import java.util.List;
 import client.Acheteur;
 
 public class VenteImpl extends UnicastRemoteObject implements Vente{
-	static Object lock = new Object();
 	
 	private static final long serialVersionUID = 1L;
 	private List<Acheteur> listeAcheteurs = new ArrayList<Acheteur>();
@@ -73,11 +72,9 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	@Override
 	public void inscriptionAcheteur(String login, Acheteur acheteur) throws Exception{
-		synchronized(lock){
-			for(Acheteur each : listeAcheteurs){
-				if(each.getPseudo().equals(login) || each.getPseudo().equals(acheteur.getPseudo())){
-					throw new Exception("Login deja pris");
-				}
+		for(Acheteur each : listeAcheteurs){
+			if(each.getPseudo().equals(login) || each.getPseudo().equals(acheteur.getPseudo())){
+				throw new Exception("Login deja pris");
 			}
 		}
 		if(this.etatVente.equals(EtatVente.TERMINE) || this.etatVente.equals(EtatVente.ENCHERISSEMENT)){
@@ -90,7 +87,6 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 			donnees.inscription(login, acheteur);
 		}
 		listeAcheteurs.add(acheteur);
-		
 	}
 
 	
@@ -112,6 +108,16 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	public synchronized int tempsEcoule(Acheteur acheteur) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void ajouterObjet(Objet objet, Acheteur acheteur) throws RemoteException {
+		try {
+			this.donnees.ajouterArticle(objet, acheteur);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 

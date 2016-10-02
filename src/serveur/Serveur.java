@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
@@ -47,21 +46,16 @@ public class Serveur{
 	
 		while(true){
 			
-			Thread.sleep(2000);
-			System.out.println(vente.getListeAcheteurs().size());
-			System.out.println(vente.getEtatVente());
-			System.out.println(vente.getObjet().getPrixCourant());
+			System.out.println("nbr acheteurs : " + vente.getListeAcheteurs().size());
+			System.out.println("etat vente : " + vente.getEtatVente());
+			System.out.println("prix : " + vente.getObjet().getPrixCourant());
+			Thread.sleep(5000);
 		
 		}
 			
-		} catch(RemoteException | InterruptedException | MalformedURLException | AlreadyBoundException e){
+		} catch(RemoteException | InterruptedException | MalformedURLException | UnknownHostException | AlreadyBoundException e){
 			e.printStackTrace();
-		} catch (UnknownHostException e) {
-			
-			e.printStackTrace();
-		}
-		
-		
+		}		
 	}	
 }
 	

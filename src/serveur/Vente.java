@@ -33,6 +33,15 @@ public interface Vente extends Remote {
 	public int tempsEcoule(Acheteur acheteur) throws RemoteException, Exception;
 	
 
+	/**
+	 * Methode permettant d ajouter un objet aux encheres.
+	 * @param objet l'objet a vendre.
+	 * @param acheteur le vendeur de l objet.
+	 * @throws RemoteException
+	 */
+	public void ajouterObjet(Objet objet, Acheteur acheteur) throws RemoteException;
+	
+	
 	public Objet getObjet() throws RemoteException;
 
 
