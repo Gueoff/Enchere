@@ -7,52 +7,71 @@ import java.rmi.server.UnicastRemoteObject;
 import serveur.Objet;
 import serveur.Vente;
 
-
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
 	private static final String adresseServeur = "localhost:8090/enchere";
+	
 	private Vente serveur;
 	private String pseudo;
-	private EtatClient etat;
-	private Chrono chrono;
+	private EtatClient etat = EtatClient.ATTENTE;
+	private Chrono chrono = new Chrono(60000); // Chrono d'1min
+	private VueClient vue;
 	private Objet currentObjet;
-
 	
 
 	public Objet getCurrentObjet() {
 		return currentObjet;
 	}
+	
+	public Chrono getChrono() {
+		return chrono;
+	}
+
+	public void setChrono(Chrono chrono) {
+		this.chrono = chrono;
+	}
+	
+	public Vente getServeur() {
+		return serveur;
+	}
+
+	public void setServeur(Vente serveur) {
+		this.serveur = serveur;
+	}
+	
+	public void setVue(VueClient vueClient) {
+		vue = vueClient;
+	}
+	
+	@Override
+	public String getPseudo() throws RemoteException {
+		return pseudo;
+	}
+	
 
 
 	public Client(String pseudo, Vente serveur) throws Exception {
 		super();
 		this.pseudo = pseudo;
 		this.serveur = serveur;
-		etat = EtatClient.ATTENTE;
-		chrono = new Chrono(60000); // Chrono d'1min
+		this.currentObjet = serveur.getObjet();
 		
 		// Inscription
-		serveur = this.connexionServeur();
 		serveur.inscriptionAcheteur(pseudo, this);
-		this.currentObjet = serveur.getObjet();
 		System.out.println(pseudo + " est ajoute a la liste d'acheteurs.");
 	}
 	
 	public Client(String pseudo) throws Exception {
-		super();
 		this.pseudo = pseudo;
 		this.serveur = connexionServeur();
-		etat = EtatClient.ATTENTE;
-		chrono = new Chrono(60000); // Chrono d'1min
+		this.currentObjet = serveur.getObjet();
 		
 		// Inscription
-		//serveur.inscriptionAcheteur(pseudo, this);
-		//System.out.println(pseudo + " est ajouté à la liste d'acheteurs.");
+		serveur.inscriptionAcheteur(pseudo, this);
+		System.out.println(pseudo + " est ajoute a la liste d'acheteurs.");
 	}
 	
-	
-
 	public Vente connexionServeur() {
 		try {
 			this.serveur = (Vente) Naming.lookup("//" + adresseServeur);
@@ -65,19 +84,6 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			return null;
 		}
 	}
-
-	public Vente getServeur() {
-		return serveur;
-	}
-
-	public void setServeur(Vente serveur) {
-		this.serveur = serveur;
-	}
-	
-	@Override
-	public String getPseudo() throws RemoteException {
-		return pseudo;
-	}
 	
 	@Override
 	public void nouvelleSoumission(String nom, String description, int prix) throws RemoteException {
@@ -86,9 +92,11 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 
 	@Override
-	public void objetVendu() throws RemoteException{
-		etat = EtatClient.TERMINE;
-		chrono.start();
+	public void objetVendu(Client gagnant) throws RemoteException{
+		this.etat = EtatClient.TERMINE;
+		this.vue.getLblEncherir().setText(gagnant.getPseudo() + "a remporte l'enchere.");
+		//vue.setCurrentObjet(serveur.getObjet());
+		this.chrono.start();
 	}
 
 	@Override
@@ -108,21 +116,13 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 	
 
-	public Chrono getChrono() {
-		return chrono;
-	}
 
-	public void setChrono(Chrono chrono) {
-		this.chrono = chrono;
-	}
 	
 	public static void main(String[] argv) throws Exception{
 		try {
 			Client c = new Client("toto");
-			
-			
-			c.objetVendu();
 			int cpt = 0;
+			
 			while(true) {
 				System.out.println( cpt + " " + c.chrono.getFini());
 				Thread.sleep(1000);
@@ -131,7 +131,5 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		} catch (RemoteException | InterruptedException e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }
