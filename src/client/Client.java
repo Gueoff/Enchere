@@ -7,23 +7,21 @@ import java.rmi.server.UnicastRemoteObject;
 import serveur.Objet;
 import serveur.Vente;
 
-
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
 	private static final String adresseServeur = "172.16.134.145:8090/enchere";
+	
 	private Vente serveur;
 	private String pseudo;
-	private EtatClient etat;
-	private Chrono chrono;
-	
+	private EtatClient etat = EtatClient.ATTENTE;
+	private Chrono chrono = new Chrono(60000); // Chrono d'1min
+	private VueClient vue;
 
 	public Client(String pseudo, Vente serveur) throws Exception {
 		super();
 		this.pseudo = pseudo;
 		this.serveur = serveur;
-		etat = EtatClient.ATTENTE;
-		chrono = new Chrono(60000); // Chrono d'1min
 		
 		// Inscription
 		serveur.inscriptionAcheteur(pseudo, this);
@@ -31,15 +29,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 	
 	public Client(String pseudo) throws Exception {
-		super();
-		this.pseudo = pseudo;
-		this.serveur = Client.connexionServeur();
-		etat = EtatClient.ATTENTE;
-		chrono = new Chrono(60000); // Chrono d'1min
-		
-		// Inscription
-		//serveur.inscriptionAcheteur(pseudo, this);
-		//System.out.println(pseudo + " est ajouté à la liste d'acheteurs.");
+		this(pseudo, connexionServeur());
 	}
 
 	public static Vente connexionServeur() {
@@ -69,7 +59,6 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	
 	@Override
 	public String getPseudo() throws RemoteException {
-
 		return pseudo;
 	}
 	
@@ -79,8 +68,10 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 
 	@Override
-	public void objetVendu() throws RemoteException{
+	public void objetVendu(Client gagnant) throws RemoteException{
 		etat = EtatClient.TERMINE;
+		vue.getLblEncherir().setText(gagnant.getPseudo() + "a remporté l'enchère.");
+		vue.setCurrentObjet(serveur.getObjet());
 		chrono.start();
 	}
 
@@ -107,7 +98,6 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			Client c = new Client("toto");
 			
 			
-			c.objetVendu();
 			int cpt = 0;
 			while(true) {
 				System.out.println( cpt + " " + c.chrono.getFini());
@@ -118,6 +108,10 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void setVue(VueClient vueClient) {
+		vue = vueClient;
 	}
 
 }
