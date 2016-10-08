@@ -59,7 +59,6 @@ public class Donnees {
 		}
 		
 		listeAcheteurs.add(acheteur);
-		
 	}
 	
 	public boolean estInscrit(String login) throws RemoteException{
@@ -90,7 +89,6 @@ public class Donnees {
 			}
 		}
 		throw new Exception("L'acheteur voulant ajouter un objet n'est pas encore inscrit");
-		
 	}
 	
 	

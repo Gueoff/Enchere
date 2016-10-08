@@ -3,7 +3,11 @@ package serveur;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import client.Acheteur;
 
@@ -11,6 +15,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	private static final long serialVersionUID = 1L;
 	private List<Acheteur> listeAcheteurs = new ArrayList<Acheteur>();
+	private Map<Acheteur, Integer> enchereTemp = new HashMap<Acheteur, Integer>();
 	private Objet objet;
 	private Acheteur acheteurCourant;
 	private EtatVente etatVente;
@@ -80,13 +85,14 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		if(this.etatVente.equals(EtatVente.TERMINE) || this.etatVente.equals(EtatVente.ENCHERISSEMENT)){
 			throw new Exception("La vente ne peut pas etre rejointe");
 		}
-		if(this.listeAcheteurs.size() >= 1 && this.etatVente.equals(EtatVente.ATTENTE)){
-			this.etatVente = EtatVente.ENCHERISSEMENT;
-		}
 		if (!donnees.estInscrit(login)){
 			donnees.inscription(login, acheteur);
 		}
-		listeAcheteurs.add(acheteur);
+		if(this.listeAcheteurs.size() >= 1 && this.etatVente.equals(EtatVente.ATTENTE)){
+			listeAcheteurs.add(acheteur);
+			this.etatVente = EtatVente.ENCHERISSEMENT;
+			notifyAll();
+		}
 	}
 
 	
@@ -96,10 +102,35 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		if(this.objet.getPrixCourant() >= nouveauPrix){
 			throw new Exception("Prix non valide");
 		}
+		this.enchereTemp.put(acheteur, nouveauPrix);
 		
-		this.objet.setPrixCourant(nouveauPrix);
-		this.acheteurCourant = acheteur;		
-		return nouveauPrix;
+		//On a reçu toutes les encheres
+		if(this.enchereTemp.size() == this.listeAcheteurs.size()){
+			System.out.println("on a recu toutes les encheres");
+			Set<Acheteur> cles = this.enchereTemp.keySet();
+			Iterator<Acheteur> it = cles.iterator();
+			
+			while (it.hasNext()){
+				Acheteur cle = it.next();
+				Integer valeur = this.enchereTemp.get(cle);
+				
+				if(valeur > this.objet.getPrixCourant()){
+					this.objet.setPrixCourant(valeur);
+					this.acheteurCourant = cle;	
+			   }
+			}
+			this.enchereTemp.clear();
+			for(Acheteur ach : this.listeAcheteurs){
+				ach.notify();
+			}
+			
+			
+		}else{
+			System.out.println("en attente de reponse...");
+			acheteur.wait();
+		}
+		
+		return objet.getPrixCourant();
 	}
 
 	
