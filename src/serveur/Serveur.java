@@ -7,9 +7,6 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.ArrayList;
-
-import client.Acheteur;
 
 
 
@@ -29,7 +26,7 @@ public class Serveur{
 		try {
 			System.out.println("@ IP : " + InetAddress.getLocalHost());
 			
-			VenteImpl vente = new VenteImpl(new ArrayList<Acheteur>(), bdd.getListeObjets().get(0));
+			VenteImpl vente = new VenteImpl(bdd.getListeObjets());
 			LocateRegistry.createRegistry(port);
 			Naming.bind("//localhost:"+port+"/enchere", vente);
 			
