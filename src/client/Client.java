@@ -3,7 +3,6 @@ package client;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.Stack;
 
 import serveur.Objet;
@@ -13,7 +12,7 @@ import serveur.VenteImpl;
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
-	private static final String adresseServeur = "localhost:8090/enchere";
+	private static final String adresseServeur = "172.16.134.147:8090/enchere";
 	
 	private Vente serveur;
 	private String pseudo;
@@ -52,10 +51,10 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	public Client(String pseudo) throws Exception {
 		super();
 		this.pseudo = pseudo;
-		//this.serveur = connexionServeur();
-		Stack<Objet> test = new Stack<Objet>();
-		test.add(new Objet("titre","description", 0));
-		this.serveur = new VenteImpl(test);
+		this.serveur = connexionServeur();
+		//Stack<Objet> test = new Stack<Objet>();
+		//test.add(new Objet("titre","description", 0));
+		//this.serveur = new VenteImpl(test);
 		this.currentObjet = serveur.getObjet();
 		
 		inscription();
@@ -86,14 +85,14 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 
 	@Override
-	public synchronized void objetVendu(Client gagnant) throws RemoteException{
+	public synchronized void objetVendu(String gagnant) throws RemoteException{
 		notify();
 		this.etat = EtatClient.TERMINE;
-		if(gagnant != null) {
-			this.vue.getLblEncherir().setText(gagnant.getPseudo() + "a remporte l'enchere.");
+		if(gagnant != "") {
+			this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
 		}
 		currentObjet = serveur.getObjet();
-		//vue.actualiserObjet();
+		vue.actualiserObjet();
 		this.chrono.start();
 	}
 
