@@ -4,6 +4,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Stack;
 
 import serveur.Objet;
 import serveur.Vente;
@@ -52,7 +53,9 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		super();
 		this.pseudo = pseudo;
 		//this.serveur = connexionServeur();
-		this.serveur = new VenteImpl(new ArrayList<Acheteur>(), new Objet("titre","description", 0));
+		Stack<Objet> test = new Stack<Objet>();
+		test.add(new Objet("titre","description", 0));
+		this.serveur = new VenteImpl(test);
 		this.currentObjet = serveur.getObjet();
 		
 		inscription();
@@ -79,18 +82,18 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	@Override
 	public void nouvelleSoumission(String nom, String description, int prix) throws RemoteException {
 		Objet nouveau = new Objet(nom, description, prix);
-		serveur.ajouterObjet(nouveau, this);
+		serveur.ajouterObjet(nouveau);
 	}
 
 	@Override
-	public void objetVendu(Client gagnant) throws RemoteException{
+	public synchronized void objetVendu(Client gagnant) throws RemoteException{
 		notify();
 		this.etat = EtatClient.TERMINE;
 		if(gagnant != null) {
 			this.vue.getLblEncherir().setText(gagnant.getPseudo() + "a remporte l'enchere.");
 		}
 		currentObjet = serveur.getObjet();
-		vue.actualiserObjet();
+		//vue.actualiserObjet();
 		this.chrono.start();
 	}
 
@@ -126,9 +129,9 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		try {
 			Client c = new Client("toto");
 			int cpt = 0;
-			
+			c.objetVendu(null);
 			while(true) {
-				System.out.println( cpt + " " + c.chrono.getFini());
+				System.out.println( cpt + " " + c.chrono.getFini() + c.getChrono());
 				Thread.sleep(1000);
 				cpt++;
 			}
