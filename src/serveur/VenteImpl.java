@@ -99,7 +99,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	
 	@Override
-	public synchronized int tempsEcoule(Acheteur acheteur) {
+	public synchronized int tempsEcoule(Acheteur acheteur) throws RemoteException {
 		long chrono = acheteur.getChrono();
 		return 0;
 	}
