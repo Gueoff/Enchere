@@ -30,7 +30,6 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	public VenteImpl(Stack<Objet> listeObjets) throws RemoteException {
 		super();
-		this.listeAcheteurs = new ArrayList<Acheteur>();
 		this.objetCourant = listeObjets.pop();
 		this.etatVente = EtatVente.ATTENTE;
 	}
@@ -49,12 +48,11 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		this.listeAcheteurs.add(acheteur);
 		
 		if(this.listeAcheteurs.size() >= 2){
-			this.etatVente = EtatVente.ENCHERISSEMENT;
-			//notifyAll();
-		}
+			this.etatVente = EtatVente.ENCHERISSEMENT;	
 		
-		for(Acheteur each : this.listeAcheteurs){
-			each.objetVendu(acheteur.getPseudo());
+			for(Acheteur each : this.listeAcheteurs){
+				each.objetVendu(null);
+			}
 		}
 	}
 
@@ -86,7 +84,12 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 			this.enchereTemp.clear();
 			
 			for(Acheteur ach : this.listeAcheteurs){
-				ach.nouveauPrix(this.objetCourant.getPrixCourant());
+				//if(!ach.equals(this.acheteurCourant)){
+					ach.nouveauPrix(this.objetCourant.getPrixCourant());
+				//}
+				//else{
+					//TODO: renvoyer prix a acheteur courant 
+				//}
 			}
 			
 		}else{
