@@ -56,8 +56,6 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		//test.add(new Objet("titre","description", 0));
 		//this.serveur = new VenteImpl(test);
 		this.currentObjet = serveur.getObjet();
-		
-		inscription();
 	}
 	
 	public void inscription() throws Exception {
@@ -84,15 +82,16 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		serveur.ajouterObjet(nouveau);
 	}
 
+	
 	@Override
 	public synchronized void objetVendu(String gagnant) throws RemoteException{
 		notify();
 		this.etat = EtatClient.TERMINE;
-		if(gagnant != "") {
-			this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
-		}
 		currentObjet = serveur.getObjet();
-		vue.actualiserObjet();
+		//vue.actualiserObjet();
+		if(gagnant != null) {
+			//this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
+		}
 		this.chrono.start();
 	}
 
@@ -108,6 +107,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			System.out.println("Prix negatif");
 		}
 		else if(etat != EtatClient.ATTENTE) {
+			chrono.interrupt();
 			serveur.rencherir(prix, this);
 			etat = EtatClient.RENCHERI;
 			System.out.println("Vous avez tenté de rencherir de " + prix +"€.");
@@ -127,13 +127,12 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	public static void main(String[] argv) throws Exception{
 		try {
 			Client c = new Client("toto");
-			int cpt = 0;
-			c.objetVendu(null);
-			while(true) {
-				System.out.println( cpt + " " + c.chrono.getFini() + c.getChrono());
-				Thread.sleep(1000);
-				cpt++;
-			}
+			c.inscription();
+
+			c.encherir(200);
+			
+			c.encherir(600);
+
 		} catch (RemoteException | InterruptedException e) {
 			e.printStackTrace();
 		}

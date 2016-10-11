@@ -16,9 +16,9 @@ public class Chrono extends Thread {
 	public void run() {
 		fini = false;
 		tempsDebut = java.lang.System.currentTimeMillis();
-		while(temps <= java.lang.System.currentTimeMillis() - tempsDebut) {
+		while(temps >= java.lang.System.currentTimeMillis() - tempsDebut) {
 			try {
-				sleep(1);
+				sleep(1000);
 			} catch (InterruptedException e) {
 			}
 		}

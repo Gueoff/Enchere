@@ -54,7 +54,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		}
 		
 		for(Acheteur each : this.listeAcheteurs){
-			each.objetVendu(acheteur.getPseudo());
+			each.objetVendu("a");
 		}
 	}
 

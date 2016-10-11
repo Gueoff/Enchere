@@ -175,6 +175,7 @@ public class VueClient extends JFrame implements ActionListener{
 		else if(arg0.getSource().equals(btnPseudo)) {
 			try {
 				setClient(new Client(txtPseudo.getText()));
+				currentClient.inscription();
 				changerGUI(this.mainPanel);
 			} catch (Exception e) {
 				e.printStackTrace();
