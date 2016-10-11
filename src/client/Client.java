@@ -3,9 +3,11 @@ package client;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 
 import serveur.Objet;
 import serveur.Vente;
+import serveur.VenteImpl;
 
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
@@ -15,7 +17,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	private Vente serveur;
 	private String pseudo;
 	private EtatClient etat = EtatClient.ATTENTE;
-	private Chrono chrono = new Chrono(60000); // Chrono d'1min
+	private Chrono chrono = new Chrono(30000, this); // Chrono de 30sc
 	private VueClient vue;
 	private Objet currentObjet;
 	
@@ -24,14 +26,11 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		return currentObjet;
 	}
 	
-	public Chrono getChrono() {
-		return chrono;
+	@Override
+	public long getChrono() {
+		return chrono.getTemps();
 	}
 
-	public void setChrono(Chrono chrono) {
-		this.chrono = chrono;
-	}
-	
 	public Vente getServeur() {
 		return serveur;
 	}
@@ -49,32 +48,24 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		return pseudo;
 	}
 	
-
-
-	public Client(String pseudo, Vente serveur) throws Exception {
+	public Client(String pseudo) throws Exception {
 		super();
 		this.pseudo = pseudo;
-		this.serveur = serveur;
+		//this.serveur = connexionServeur();
+		this.serveur = new VenteImpl(new ArrayList<Acheteur>(), new Objet("titre","description", 0));
 		this.currentObjet = serveur.getObjet();
 		
-		// Inscription
+		inscription();
+	}
+	
+	public void inscription() throws Exception {
 		serveur.inscriptionAcheteur(pseudo, this);
 		System.out.println(pseudo + " est ajoute a la liste d'acheteurs.");
 	}
 	
-	public Client(String pseudo) throws Exception {
-		this.pseudo = pseudo;
-		this.serveur = connexionServeur();
-		this.currentObjet = serveur.getObjet();
-		
-		// Inscription
-		serveur.inscriptionAcheteur(pseudo, this);
-		System.out.println(pseudo + " est ajoute a la liste d'acheteurs.");
-	}
-	
-	public Vente connexionServeur() {
+	public static Vente connexionServeur() {
 		try {
-			this.serveur = (Vente) Naming.lookup("//" + adresseServeur);
+			Vente serveur = (Vente) Naming.lookup("//" + adresseServeur);
 			System.out.println("Connexion au serveur " + adresseServeur + " reussi. ");
 			return serveur;
 
@@ -93,30 +84,43 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	@Override
 	public void objetVendu(Client gagnant) throws RemoteException{
+		notify();
 		this.etat = EtatClient.TERMINE;
-		this.vue.getLblEncherir().setText(gagnant.getPseudo() + "a remporte l'enchere.");
-		//vue.setCurrentObjet(serveur.getObjet());
+		if(gagnant != null) {
+			this.vue.getLblEncherir().setText(gagnant.getPseudo() + "a remporte l'enchere.");
+		}
+		currentObjet = serveur.getObjet();
+		vue.actualiserObjet();
 		this.chrono.start();
 	}
 
-	@Override
-	public void nouveauPrix(int prix) throws RemoteException, Exception {
-		if(prix <= this.currentObjet.getPrixCourant()){
-			throw new Exception("Prix trop bas, ne soyez pas radin !");
+	public synchronized void encherir(int prix) throws RemoteException, Exception {
+		if(chrono.getFini()) {
+			serveur.rencherir(-1, this);
+			etat = EtatClient.RENCHERI;
+		}
+		else if(prix <= this.currentObjet.getPrixCourant()){
+			System.out.println("Prix trop bas, ne soyez pas radin !");
 		}
 		else if(prix < 0){
-			throw new Exception("Prix negatif");
+			System.out.println("Prix negatif");
 		}
-		//if(!chrono.getFini() & etat != EtatClient.ATTENTE) {
+		else if(etat != EtatClient.ATTENTE) {
 			serveur.rencherir(prix, this);
 			etat = EtatClient.RENCHERI;
-			System.out.println("Vous avez tente de rencherir de " + prix +"�.");
+			System.out.println("Vous avez tenté de rencherir de " + prix +"€.");
 			this.currentObjet = serveur.getObjet();
-		//}
+		}
+		wait();
 	}
 	
-
-
+	@Override
+	public synchronized void nouveauPrix(int prix) throws Exception {
+		notify();
+		this.chrono.start();
+		currentObjet.setPrixCourant(prix);
+		vue.actualiserPrix();
+	}
 	
 	public static void main(String[] argv) throws Exception{
 		try {

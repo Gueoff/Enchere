@@ -15,14 +15,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import serveur.Vente;
+import serveur.Objet;
 
 public class VueClient extends JFrame implements ActionListener{
 
 	private static final long serialVersionUID = 9070911591784925769L;
 	
 	// Informations sur de l'Etat de la vente
-	private Vente serveur;
 	private Client currentClient;
 	
 	// Elements SWING
@@ -131,16 +130,22 @@ public class VueClient extends JFrame implements ActionListener{
 		this.setVisible(true);
 	}
 	
+	public void actualiserPrix() {
+		int prix = currentClient.getCurrentObjet().getPrixCourant();
+		lblPrixObjet.setText("Prix courant : " + prix + "€");
+		this.repaint();
+	}
 	
-	private void actualiserObjet() {
-		lblPrixObjet.setText("Prix courant : " + this.currentClient.getCurrentObjet().getPrixCourant() + "�");
-		lblDescriptionObjet.setText(this.currentClient.getCurrentObjet().getDescription());
+	public void actualiserObjet() {
+		Objet objet = currentClient.getCurrentObjet();
+		lblPrixObjet.setText("Prix courant : " + objet.getPrixCourant() + "€");
+		lblDescriptionObjet.setText(objet.getDescription());
 		txtEncherir.setText("");
-		if (this.currentClient.getCurrentObjet().isDisponible()) {
-			lblNomObjet.setText(this.currentClient.getCurrentObjet().getNom() + "(disponible)");
+		if (objet.isDisponible()) {
+			lblNomObjet.setText(objet.getNom() + "(disponible)");
 		}
 		else{
-			lblNomObjet.setText(this.currentClient.getCurrentObjet().getNom() + "(vendu)");
+			lblNomObjet.setText(objet.getNom() + "(vendu)");
 		}
 	}
 	
@@ -169,7 +174,7 @@ public class VueClient extends JFrame implements ActionListener{
 		// INSCRIPTION
 		else if(arg0.getSource().equals(btnPseudo)) {
 			try {
-				currentClient = new Client(txtPseudo.getText());
+				setClient(new Client(txtPseudo.getText()));
 				changerGUI(this.mainPanel);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -195,8 +200,9 @@ public class VueClient extends JFrame implements ActionListener{
 	/**
 	 * Methode servant a changer l affichage pour le panel passe en parametre.
 	 * @param vue le JPanel a afficher.
+	 * @throws RemoteException 
 	 */
-	public void changerGUI(JPanel vue){
+	public void changerGUI(JPanel vue) throws RemoteException{
 		if(this.currentClient.getCurrentObjet() != null){
 			actualiserObjet();
 		}
