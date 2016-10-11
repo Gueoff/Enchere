@@ -15,5 +15,6 @@ public interface Acheteur extends Remote {
 	
 	public void nouveauPrix(int prix) throws RemoteException, Exception;
 	public String getPseudo() throws RemoteException;
+	public long getChrono() throws RemoteException;
 
 }
