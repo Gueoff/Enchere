@@ -49,7 +49,6 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		
 		if(this.listeAcheteurs.size() >= 2){
 			this.etatVente = EtatVente.ENCHERISSEMENT;	
-		
 
 			for(Acheteur each : this.listeAcheteurs){
 				each.objetVendu(null);
@@ -65,7 +64,6 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		
 		//On a recu toutes les encheres
 		if(this.enchereTemp.size() == this.listeAcheteurs.size()){
-			System.out.println("on a recu toutes les encheres");
 			Set<Acheteur> cles = this.enchereTemp.keySet();
 			Iterator<Acheteur> it = cles.iterator();
 			
@@ -84,17 +82,19 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 			}
 			this.enchereTemp.clear();
 			
-			for(Acheteur ach : this.listeAcheteurs){
-				//if(!ach.equals(this.acheteurCourant)){
-					ach.nouveauPrix(this.objetCourant.getPrixCourant());
-				//}
-				//else{
+			for(Acheteur each : this.listeAcheteurs){
+				if(!each.equals(this.acheteurCourant)){
+					System.out.println("go notifier l'acheteur " + each.getPseudo());
+					each.nouveauPrix(this.objetCourant.getPrixCourant());
+				}
+				else{
 					//TODO: renvoyer prix a acheteur courant 
-				//}
+					this.enchereTemp.put(each, this.objetCourant.getPrixCourant());
+				}
 			}
 			
 		}else{
-			System.out.println("en attente de reponse...");
+			//System.out.println("en attente de reponse...");
 		}
 		
 		return objetCourant.getPrixCourant();
@@ -104,7 +104,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	@Override
 	public synchronized int tempsEcoule(Acheteur acheteur) throws RemoteException {
-		long chrono = acheteur.getChrono();
+		//long chrono = acheteur.getChrono();
 		return 0;
 	}
 

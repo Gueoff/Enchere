@@ -12,7 +12,7 @@ import serveur.VenteImpl;
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
 	private static final long serialVersionUID = 1L;
-	private static final String adresseServeur = "172.16.134.147:8090/enchere";
+	private static final String adresseServeur = "localhost:8090/enchere";
 	
 	private Vente serveur;
 	private String pseudo;
@@ -93,6 +93,7 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			//this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
 		}
 		this.chrono.start();
+		System.out.println("on a lanc� le chrono");
 	}
 
 	public synchronized void encherir(int prix) throws RemoteException, Exception {
@@ -110,28 +111,36 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 			chrono.interrupt();
 			serveur.rencherir(prix, this);
 			etat = EtatClient.RENCHERI;
-			System.out.println("Vous avez tenté de rencherir de " + prix +"€.");
+			System.out.println("Vous avez tente de rencherir de " + prix +" euros.");
 			this.currentObjet = serveur.getObjet();
 		}
 		wait();
 	}
 	
 	@Override
-	public synchronized void nouveauPrix(int prix) throws Exception {
-		notify();
-		this.chrono.start();
-		currentObjet.setPrixCourant(prix);
-		vue.actualiserPrix();
+	public synchronized void nouveauPrix(int prix) throws RemoteException {
+		try{
+			notify();
+			System.out.println("le nouveau prix : " + prix);
+			this.chrono.start();
+			currentObjet.setPrixCourant(prix);
+			vue.actualiserPrix();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static void main(String[] argv) throws Exception{
 		try {
 			Client c = new Client("toto");
 			c.inscription();
-
+			System.out.println("normalement je suis inscrit");
 			c.encherir(200);
-			
+			System.out.println("j'ai encheri de 200 -> je perd la premiere");
 			c.encherir(600);
+			System.out.println("j'ai encheri de 600-> je gagne la deuxieme");
 
 		} catch (RemoteException | InterruptedException e) {
 			e.printStackTrace();

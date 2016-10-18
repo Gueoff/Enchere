@@ -13,7 +13,7 @@ public interface Acheteur extends Remote {
 	 */
 	public void objetVendu(String gagnant) throws RemoteException;
 	
-	public void nouveauPrix(int prix) throws RemoteException, Exception;
+	public void nouveauPrix(int prix) throws RemoteException;
 	public String getPseudo() throws RemoteException;
 	public long getChrono() throws RemoteException;
 

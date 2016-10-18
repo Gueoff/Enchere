@@ -132,13 +132,13 @@ public class VueClient extends JFrame implements ActionListener{
 	
 	public void actualiserPrix() {
 		int prix = currentClient.getCurrentObjet().getPrixCourant();
-		lblPrixObjet.setText("Prix courant : " + prix + "€");
+		lblPrixObjet.setText("Prix courant : " + prix + " euros");
 		this.repaint();
 	}
 	
 	public void actualiserObjet() {
 		Objet objet = currentClient.getCurrentObjet();
-		lblPrixObjet.setText("Prix courant : " + objet.getPrixCourant() + "€");
+		lblPrixObjet.setText("Prix courant : " + objet.getPrixCourant() + " euros");
 		lblDescriptionObjet.setText(objet.getDescription());
 		txtEncherir.setText("");
 		if (objet.isDisponible()) {
@@ -162,7 +162,7 @@ public class VueClient extends JFrame implements ActionListener{
 		if(arg0.getSource().equals(this.btnEncherir)){
 			if(!txtEncherir.getText().isEmpty()){
 				try {
-					currentClient.nouveauPrix(Integer.parseInt(txtEncherir.getText()));
+					currentClient.encherir(Integer.parseInt(txtEncherir.getText()));
 					actualiserObjet();
 				} catch (Exception e) {
 					e.printStackTrace();

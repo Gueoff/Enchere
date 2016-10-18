@@ -24,7 +24,7 @@ public class Chrono extends Thread {
 		}
 		fini = true;
 		try {
-			client.nouveauPrix(0);
+			client.encherir(-1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
