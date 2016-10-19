@@ -59,11 +59,12 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	@Override
 	public synchronized int rencherir(int nouveauPrix, Acheteur acheteur) throws Exception{
-		
+		System.out.println("On recoit une enchere");
 		this.enchereTemp.put(acheteur, nouveauPrix);
 		
 		//On a recu toutes les encheres
 		if(this.enchereTemp.size() == this.listeAcheteurs.size()){
+			System.out.println("on a toutes les demandes");
 			Set<Acheteur> cles = this.enchereTemp.keySet();
 			Iterator<Acheteur> it = cles.iterator();
 			
@@ -81,20 +82,17 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 			   }
 			}
 			this.enchereTemp.clear();
+			this.enchereTemp.put(this.acheteurCourant, this.objetCourant.getPrixCourant());
+			System.out.println(this.acheteurCourant.getPseudo()+" a gagné la bataille, mais pas la guerre");
 			
+			//On renvoie le resultat du tour
 			for(Acheteur each : this.listeAcheteurs){
-				if(!each.equals(this.acheteurCourant)){
-					System.out.println("go notifier l'acheteur " + each.getPseudo());
-					each.nouveauPrix(this.objetCourant.getPrixCourant());
-				}
-				else{
-					//TODO: renvoyer prix a acheteur courant 
-					this.enchereTemp.put(each, this.objetCourant.getPrixCourant());
-				}
+				System.out.println("nouveauPrix() pour "+each.getPseudo());
+				each.nouveauPrix(this.objetCourant.getPrixCourant(), this.acheteurCourant);
 			}
 			
 		}else{
-			//System.out.println("en attente de reponse...");
+			System.out.println("en attente de reponse...");
 		}
 		
 		return objetCourant.getPrixCourant();

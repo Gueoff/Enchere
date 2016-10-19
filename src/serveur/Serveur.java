@@ -46,8 +46,8 @@ public class Serveur{
 			System.out.println("nbr acheteurs : " + vente.getListeAcheteurs().size());
 			System.out.println("etat vente : " + vente.getEtatVente());
 			System.out.println("prix : " + vente.getObjet().getPrixCourant());
-			Thread.sleep(5000);*/
-		
+			Thread.sleep(5000);
+			*/
 		}
 			
 		} catch(RemoteException |  MalformedURLException | UnknownHostException | AlreadyBoundException e){

@@ -3,11 +3,9 @@ package client;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Stack;
 
 import serveur.Objet;
 import serveur.Vente;
-import serveur.VenteImpl;
 
 public class Client extends UnicastRemoteObject  implements Acheteur {
 
@@ -52,9 +50,6 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		super();
 		this.pseudo = pseudo;
 		this.serveur = connexionServeur();
-		//Stack<Objet> test = new Stack<Objet>();
-		//test.add(new Objet("titre","description", 0));
-		//this.serveur = new VenteImpl(test);
 		this.currentObjet = serveur.getObjet();
 	}
 	
@@ -97,6 +92,8 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 	}
 
 	public synchronized void encherir(int prix) throws RemoteException, Exception {
+		System.out.println("Vous avez tente de rencherir de " + prix +" euros.");
+		
 		if(chrono.getFini()) {
 			serveur.rencherir(-1, this);
 			etat = EtatClient.RENCHERI;
@@ -109,22 +106,29 @@ public class Client extends UnicastRemoteObject  implements Acheteur {
 		}
 		else if(etat != EtatClient.ATTENTE) {
 			chrono.interrupt();
-			serveur.rencherir(prix, this);
 			etat = EtatClient.RENCHERI;
-			System.out.println("Vous avez tente de rencherir de " + prix +" euros.");
+			serveur.rencherir(prix, this);
 			this.currentObjet = serveur.getObjet();
 		}
 		wait();
 	}
 	
 	@Override
-	public synchronized void nouveauPrix(int prix) throws RemoteException {
+	public synchronized void nouveauPrix(int prix, Acheteur gagnant) throws RemoteException {
 		try{
 			notify();
 			System.out.println("le nouveau prix : " + prix);
+			this.currentObjet.setPrixCourant(prix);
+			this.vue.actualiserPrix();
+			this.vue.actualiserObjet();
+			
+			//Vous etes le gagnant du moment
+			if(this.equals(gagnant)){
+				System.out.println("vous etes le gagnant du moment ... attendez...");
+				wait();
+			}
+			
 			this.chrono.start();
-			currentObjet.setPrixCourant(prix);
-			vue.actualiserPrix();
 		}
 		catch(Exception e){
 			e.printStackTrace();
