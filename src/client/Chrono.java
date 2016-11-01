@@ -2,40 +2,56 @@ package client;
 
 public class Chrono extends Thread {
 
-	private int temps;
-	private boolean fini;
 	private Client client;
-	private long tempsDebut;
+	private long tempsFin;
+	private long tempsEcoule;
+	private boolean enCours = false;
 	
-	public Chrono(int millisecondes, Client c) {
-		temps = millisecondes;
-		fini = false;
+	public Chrono(long secondes, Client c) {
+		tempsFin = secondes;
 		client = c;
 	}
 	
 	public void run() {
-		fini = false;
-		tempsDebut = java.lang.System.currentTimeMillis();
-		while(temps >= java.lang.System.currentTimeMillis() - tempsDebut) {
-			try {
-				sleep(1000);
-			} catch (InterruptedException e) {
+		while(true) {
+			if(enCours) {
+				System.out.println("Début du chrono.");
+				tempsEcoule = 0;
+				while((tempsFin * 1000)>= tempsEcoule && enCours) {
+					try {
+						sleep(1); // Attends 1ms
+						tempsEcoule++;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				System.out.println("Fin du chrono.");
+				if(enCours) {
+					try {
+						client.encherir(-1);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				enCours = false;
 			}
+			System.out.print(""); // A mettre apparemment, histoire des boucles vides. Comprends pas.
 		}
-		fini = true;
-		try {
-			client.encherir(-1);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 	
 	public long getTemps() {
-		return java.lang.System.currentTimeMillis() - tempsDebut;
+		return tempsEcoule;
 	}
 
+	public void demarrer() {
+		enCours = true;
+	}
+	
+	public void arreter() {
+		enCours = false;
+	}
+	
 	public boolean getFini() {
-		return fini;
+		return enCours;
 	}
 }

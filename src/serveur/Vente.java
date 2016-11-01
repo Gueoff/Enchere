@@ -13,7 +13,7 @@ public interface Vente extends Remote {
 	 * @param acheteur
 	 * @throws RemoteException
 	 */
-	public void inscriptionAcheteur(String login, Acheteur acheteur) throws RemoteException, Exception;
+	public boolean inscriptionAcheteur(String login, Acheteur acheteur) throws RemoteException, Exception;
 	
 	/**
 	 * Augmente le prix de l'objet a vendre.

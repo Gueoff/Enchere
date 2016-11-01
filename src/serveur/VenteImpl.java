@@ -35,18 +35,17 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	}
 
 
-	
-	
 	@Override
-	public void inscriptionAcheteur(String login, Acheteur acheteur) throws Exception{
+	public synchronized boolean inscriptionAcheteur(String login, Acheteur acheteur) throws Exception{
 		for(Acheteur each : listeAcheteurs){
 			if(each.getPseudo().equals(login) || each.getPseudo().equals(acheteur.getPseudo())){
 				throw new Exception("Login deja pris");
 			}
 		}
-		
+				
 		this.listeAcheteurs.add(acheteur);
-		
+		System.out.println("Acheteur " + login + " ajoutÃ©.");
+
 		if(this.listeAcheteurs.size() >= 2){
 			this.etatVente = EtatVente.ENCHERISSEMENT;	
 
@@ -54,6 +53,8 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 				each.objetVendu(null);
 			}
 		}
+		
+		return (this.listeAcheteurs.size() >= 2);
 	}
 
 	
@@ -83,7 +84,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 			}
 			this.enchereTemp.clear();
 			this.enchereTemp.put(this.acheteurCourant, this.objetCourant.getPrixCourant());
-			System.out.println(this.acheteurCourant.getPseudo()+" a gagné la bataille, mais pas la guerre");
+			System.out.println(this.acheteurCourant.getPseudo()+" a gagnï¿½ la bataille, mais pas la guerre");
 			
 			//On renvoie le resultat du tour
 			for(Acheteur each : this.listeAcheteurs){
@@ -101,7 +102,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	
 	@Override
-	public synchronized int tempsEcoule(Acheteur acheteur) throws RemoteException {
+	public int tempsEcoule(Acheteur acheteur) throws RemoteException {
 		//long chrono = acheteur.getChrono();
 		return 0;
 	}
