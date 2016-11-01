@@ -43,37 +43,41 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 		serveur.inscriptionAcheteur(pseudo, this);
 	}
 
-	public void encherir(int prix) throws RemoteException, Exception {
-		if (prix <= this.currentObjet.getPrixCourant()) {
+	public void encherir(int prix) throws RemoteException, Exception {		
+		if (prix <= this.currentObjet.getPrixCourant() && prix != -1) {
 			System.out.println("Prix trop bas, ne soyez pas radin !");
 		} else if (etat == EtatClient.RENCHERI) {
 			System.out.println("Vous rencherissez de " + prix + " euros.");
 			chrono.arreter();
-			serveur.rencherir(prix, this);
 			etat = EtatClient.ATTENTE;
+			serveur.rencherir(prix, this);
 		}
 	}
 
 	@Override
 	public void objetVendu(String gagnant) throws RemoteException {
-		currentObjet = serveur.getObjet();
-		// vue.actualiserObjet();
+		this.currentObjet = serveur.getObjet();
+		this.vue.actualiserObjet();
+		
 		if (gagnant != null) {
-			// this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
+			this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
+			this.etat = EtatClient.TERMINE;
+		}else{
+			this.etat = EtatClient.RENCHERI;
+			this.chrono.demarrer();
 		}
-		this.chrono.demarrer();
-		this.etat = EtatClient.RENCHERI;
 	}
 
 	@Override
 	public void nouveauPrix(int prix, Acheteur gagnant) throws RemoteException {
+		System.out.println("etat de "+this.pseudo + " : "+this.etat);
+		
 		try {
 			System.out.println(gagnant.getPseudo() + " a remporté la manche. Nouveau prix de  l'enchère : " + prix + " euros.");
-			this.chrono.demarrer();
 			this.currentObjet.setPrixCourant(prix);
-			//this.vue.actualiserPrix();
-			//this.vue.actualiserObjet();
+			this.vue.actualiserPrix();
 			this.etat = EtatClient.RENCHERI;
+			this.chrono.demarrer();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
