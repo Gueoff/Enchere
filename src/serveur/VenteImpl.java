@@ -16,6 +16,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	private static final long serialVersionUID = 1L;
 	private List<Acheteur> listeAcheteurs = new ArrayList<Acheteur>();
+	private List<Acheteur> fileAttente = new ArrayList<Acheteur>();
 	private Map<Acheteur, Integer> enchereTemp = new HashMap<Acheteur, Integer>();
 	private Objet objetCourant;
 	private Stack<Objet> listeObjets;
@@ -42,20 +43,21 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 			if(each.getPseudo().equals(login) || each.getPseudo().equals(acheteur.getPseudo())){
 				throw new Exception("Login deja pris");
 			}
-		}
-				
-		this.listeAcheteurs.add(acheteur);
-		System.out.println("Acheteur " + login + " ajouté.");
+		}			
+		this.fileAttente.add(acheteur);
 
-		if(this.listeAcheteurs.size() >= 2){
+		if(this.fileAttente.size() >= 2 && (this.etatVente == EtatVente.ATTENTE || this.etatVente == EtatVente.TERMINE)){
 			this.etatVente = EtatVente.ENCHERISSEMENT;	
-
-			for(Acheteur each : this.listeAcheteurs){
+			
+			for(Acheteur each : this.fileAttente){
+				this.listeAcheteurs.add(each);
 				each.objetVendu(null);
 			}
+			this.fileAttente.clear();
+			return true;
 		}
 		
-		return (this.listeAcheteurs.size() >= 2);
+		return false;
 	}
 
 	
@@ -64,28 +66,15 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		System.out.println("On recoit une enchere");
 		this.enchereTemp.put(acheteur, nouveauPrix);
 		
+		System.out.println("On est à "+this.enchereTemp.size()+" reponses sur "+this.listeAcheteurs.size());
+		
 		//On a recu toutes les encheres
 		if(this.enchereTemp.size() == this.listeAcheteurs.size()){
 			System.out.println("on a toutes les demandes");
 			
 			//Fin des encheres, on clean
 			if(fini()){
-				this.enchereTemp.clear();
-				this.objetCourant.setDisponible(false);
-				this.etatVente = EtatVente.TERMINE;
-				
-				for(Acheteur each : this.listeAcheteurs){
-					each.objetVendu(this.acheteurCourant.getPseudo());
-				}
-				
-				Thread.sleep(100);
-				this.enchereTemp.clear();
-				this.acheteurCourant = null;
-				this.objetCourant = this.listeObjets.pop();
-				
-				for(Acheteur each : this.listeAcheteurs){
-					each.objetVendu(null);
-				}
+				enchereSuivante();
 			}
 			
 			//On encheri sur le meme objet
@@ -104,15 +93,11 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 				}
 				
 				this.enchereTemp.clear();
-				//this.enchereTemp.put(this.acheteurCourant, this.objetCourant.getPrixCourant());
-				System.out.println(this.acheteurCourant.getPseudo()+" a gagné la bataille, mais pas la guerre");
-				
 				//On renvoie le resultat du tour
 				for(Acheteur each : this.listeAcheteurs){
 					each.nouveauPrix(this.objetCourant.getPrixCourant(), this.acheteurCourant);
 				}
 			}
-			
 		}else{
 			System.out.println("en attente de reponse...");
 		}
@@ -120,6 +105,34 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		return objetCourant.getPrixCourant();
 	}
 
+	
+	/**
+	 * Permet de passer à l'objet suivant avec les bons acheteurs et bons objets.
+	 * @throws RemoteException
+	 * @throws InterruptedException
+	 */
+	public void enchereSuivante() throws RemoteException, InterruptedException{
+		this.enchereTemp.clear();
+		this.objetCourant.setDisponible(false);
+		this.etatVente = EtatVente.TERMINE;
+		
+		for(Acheteur each : this.listeAcheteurs){
+			each.objetVendu(this.acheteurCourant.getPseudo());
+		}
+		
+		Thread.sleep(100);
+		this.enchereTemp.clear();
+		this.acheteurCourant = null;
+		this.objetCourant = this.listeObjets.pop();
+		this.listeAcheteurs.addAll(this.fileAttente);
+		this.fileAttente.clear();
+		this.etatVente = EtatVente.ENCHERISSEMENT;
+		
+		for(Acheteur each : this.listeAcheteurs){
+			each.objetVendu(null);
+		}
+	}
+	
 	
 	/**
 	 * méthode utilitaire qui permet de savoir si les encheres sont finis.

@@ -27,12 +27,14 @@ public class VueClient extends JFrame implements ActionListener{
 	// Elements SWING
 	private JPanel mainPanel = new JPanel();
 	private JPanel inscriptionPanel = new JPanel();
+	private JPanel attentePanel = new JPanel();
 	
 	private JLabel lblPrixObjet = new JLabel();
 	private JLabel lblNomObjet = new JLabel();
 	private JLabel lblDescriptionObjet = new JLabel();
 	private JLabel lblPseudo = new JLabel();
 	private JLabel lblEncherir = new JLabel();
+	private JLabel lblAttente = new JLabel();
 
 	private JButton btnEncherir = new JButton("Encherir");
 	private JButton btnPseudo = new JButton("Inscription");
@@ -58,6 +60,10 @@ public class VueClient extends JFrame implements ActionListener{
 		this.setSize(800,400);
 		this.setTitle("Encheres2ouf");
 		Font fontBtn = new Font("Serif", Font.PLAIN, 10); // par exemple 
+		
+		//PANEL ATTENTE
+		lblAttente.setText("En attente d'une nouvelle enchère...");
+		attentePanel.add(lblAttente);
 		
 		// PANEL INSCRIPTION
 		inscriptionPanel.setLayout(new GridBagLayout());
@@ -176,7 +182,7 @@ public class VueClient extends JFrame implements ActionListener{
 			try {
 				setClient(new Client(txtPseudo.getText()));
 				currentClient.inscription();
-				changerGUI(this.mainPanel);
+				//changerGUI(this.attentePanel);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Inscription impossible");
@@ -231,6 +237,14 @@ public class VueClient extends JFrame implements ActionListener{
 		frmSoumettre.setVisible(true);
 	}
 	
+	public JPanel getMainPanel() {
+		return mainPanel;
+	}
+
+	public JPanel getAttentePanel() {
+		return attentePanel;
+	}
+
 	public static void main(String[] args) throws Exception {
 		new VueClient();
 	}
