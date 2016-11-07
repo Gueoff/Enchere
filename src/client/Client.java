@@ -40,12 +40,8 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	}
 
 	public void inscription() throws Exception {
-		if(!serveur.inscriptionAcheteur(pseudo, this)){
-			this.vue.changerGUI(this.vue.getAttentePanel());
-		}
-		else{
-			//this.vue.changerGUI(this.vue.getAttentePanel());
-		}
+		serveur.inscriptionAcheteur(pseudo, this);
+		//vue.changerGUI(this.vue.getAttentePanel());
 	}
 
 	public void encherir(int prix) throws RemoteException, Exception {		
@@ -62,9 +58,6 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	@Override
 	public void objetVendu(String gagnant) throws RemoteException {
 		this.currentObjet = serveur.getObjet();
-		if(!this.vue.getContentPane().equals(this.vue.getMainPanel())){
-			this.vue.changerGUI(this.vue.getMainPanel());
-		}
 		this.vue.actualiserObjet();
 		
 		if (gagnant != null) {
@@ -74,6 +67,7 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 			this.etat = EtatClient.RENCHERI;
 			this.chrono.demarrer();
 		}
+		//this.vue.changerGUI(this.vue.getMainPanel());
 	}
 
 	@Override

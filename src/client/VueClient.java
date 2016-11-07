@@ -182,6 +182,7 @@ public class VueClient extends JFrame implements ActionListener{
 			try {
 				setClient(new Client(txtPseudo.getText()));
 				currentClient.inscription();
+				changerGUI(this.mainPanel);
 				//changerGUI(this.attentePanel);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -213,10 +214,15 @@ public class VueClient extends JFrame implements ActionListener{
 		if(this.currentClient.getCurrentObjet() != null){
 			actualiserObjet();
 		}
+		System.out.println("1");
 		this.getContentPane().removeAll();
+		System.out.println("2");
 		this.setContentPane(vue);
+		System.out.println("3");
 		this.getContentPane().revalidate();
+		System.out.println("4");
 		this.getContentPane().repaint();
+		System.out.println("5");
 	}
 
 	private void soumettre() {
