@@ -50,6 +50,7 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 		} else if (etat == EtatClient.RENCHERI) {
 			System.out.println("Vous rencherissez de " + prix + " euros.");
 			chrono.arreter();
+			vue.attente();
 			etat = EtatClient.ATTENTE;
 			serveur.rencherir(prix, this);
 		}
@@ -59,9 +60,10 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	public void objetVendu(String gagnant) throws RemoteException {
 		this.currentObjet = serveur.getObjet();
 		this.vue.actualiserObjet();
+		this.vue.reprise();
 		
 		if (gagnant != null) {
-			this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchere.");
+			this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchère.");
 			this.etat = EtatClient.TERMINE;
 		}else{
 			this.etat = EtatClient.RENCHERI;
@@ -77,7 +79,9 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 		try {
 			System.out.println(gagnant.getPseudo() + " a remporté la manche. Nouveau prix de  l'enchère : " + prix + " euros.");
 			this.currentObjet.setPrixCourant(prix);
+			this.currentObjet.setGagnant(gagnant.getPseudo());
 			this.vue.actualiserPrix();
+			this.vue.reprise();
 			this.etat = EtatClient.RENCHERI;
 			this.chrono.demarrer();
 		} catch (Exception e) {

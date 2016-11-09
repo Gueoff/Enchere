@@ -40,6 +40,7 @@ public class VueClient extends JFrame implements ActionListener{
 	private JButton btnPseudo = new JButton("Inscription");
 	private JButton btnSoumettre = new JButton("Soumettre une enchere");
 	private JButton btnSoumettreObjet = new JButton("Soumettre");
+	private JButton btnStop = new JButton("Stop");
 	
 	private JTextField txtEncherir = new JTextField();
 	private JTextField txtPseudo = new JTextField();
@@ -91,6 +92,8 @@ public class VueClient extends JFrame implements ActionListener{
 		txtEncherir.setPreferredSize(new Dimension(300,40));
 		btnEncherir.setPreferredSize(new Dimension(100,40));
 		btnEncherir.setFont(fontBtn);
+		btnStop.setPreferredSize(new Dimension(100,40));
+		btnStop.setFont(fontBtn);
 		btnSoumettre.setPreferredSize(new Dimension(100,40));
 		btnSoumettre.setFont(fontBtn);
 				
@@ -98,12 +101,14 @@ public class VueClient extends JFrame implements ActionListener{
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.gridheight = 1;
-		gbc.gridwidth = 2;
+		gbc.gridwidth = 1;
 		mainPanel.add(lblNomObjet, gbc);
 		
-		gbc.gridx = 3;
-		gbc.gridheight = 1;
+		gbc.gridx = 2;
 		mainPanel.add(lblPrixObjet, gbc);
+		
+		gbc.gridx = 3;
+		mainPanel.add(lblPseudo, gbc);
 		
 		//2eme ligne
 		gbc.gridx = 0;
@@ -124,6 +129,10 @@ public class VueClient extends JFrame implements ActionListener{
 		
 		gbc.gridx=5;
 		gbc.gridwidth=1;
+		mainPanel.add(btnStop, gbc);
+		
+		gbc.gridx=6;
+		gbc.gridwidth=1;
 		mainPanel.add(btnSoumettre, gbc);
 		
 		// Ajout des liaison avec les boutons
@@ -131,6 +140,7 @@ public class VueClient extends JFrame implements ActionListener{
 		btnPseudo.addActionListener(this);
 		btnSoumettre.addActionListener(this);
 		btnSoumettreObjet.addActionListener(this);
+		btnStop.addActionListener(this);
 
 		this.setContentPane(inscriptionPanel);
 		this.setVisible(true);
@@ -139,14 +149,18 @@ public class VueClient extends JFrame implements ActionListener{
 	public void actualiserPrix() {
 		int prix = currentClient.getCurrentObjet().getPrixCourant();
 		lblPrixObjet.setText("Prix courant : " + prix + " euros");
+		lblPseudo.setText(this.currentClient.getCurrentObjet().getGagnant());
 		this.repaint();
 	}
 	
 	public void actualiserObjet() {
 		Objet objet = currentClient.getCurrentObjet();
 		lblPrixObjet.setText("Prix courant : " + objet.getPrixCourant() + " euros");
+		lblPseudo.setText(this.currentClient.getCurrentObjet().getGagnant());
 		lblDescriptionObjet.setText(objet.getDescription());
 		txtEncherir.setText("");
+		
+		System.out.println(objet.isDisponible());
 		if (objet.isDisponible()) {
 			lblNomObjet.setText(objet.getNom() + "(disponible)");
 		}
@@ -167,12 +181,22 @@ public class VueClient extends JFrame implements ActionListener{
 		// ENCHERIR			
 		if(arg0.getSource().equals(this.btnEncherir)){
 			if(!txtEncherir.getText().isEmpty()){
-				try {
+				try {	
 					currentClient.encherir(Integer.parseInt(txtEncherir.getText()));
 					actualiserObjet();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			}
+		}
+		
+		//STOP
+		else if(arg0.getSource().equals(this.btnStop)){
+			try {
+				currentClient.encherir(-1);
+				actualiserObjet();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		
@@ -214,15 +238,20 @@ public class VueClient extends JFrame implements ActionListener{
 		if(this.currentClient.getCurrentObjet() != null){
 			actualiserObjet();
 		}
-		System.out.println("1");
 		this.getContentPane().removeAll();
-		System.out.println("2");
 		this.setContentPane(vue);
-		System.out.println("3");
 		this.getContentPane().revalidate();
-		System.out.println("4");
 		this.getContentPane().repaint();
-		System.out.println("5");
+	}
+	
+	public void attente(){
+		this.btnEncherir.setEnabled(false);
+		this.btnStop.setEnabled(false);
+	}
+	
+	public void reprise(){
+		this.btnEncherir.setEnabled(true);
+		this.btnStop.setEnabled(true);
 	}
 
 	private void soumettre() {

@@ -89,6 +89,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 					if(valeur > this.objetCourant.getPrixCourant() || (valeur == this.objetCourant.getPrixCourant() && cle.getChrono() < acheteurCourant.getChrono())){
 						this.objetCourant.setPrixCourant(valeur);
 						this.acheteurCourant = cle;	
+						this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
 				   }
 				}
 				
@@ -115,18 +116,20 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		this.enchereTemp.clear();
 		this.objetCourant.setDisponible(false);
 		this.etatVente = EtatVente.TERMINE;
+		this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
 		
 		for(Acheteur each : this.listeAcheteurs){
 			each.objetVendu(this.acheteurCourant.getPseudo());
 		}
 		
-		Thread.sleep(100);
+		Thread.sleep(5000);
 		this.enchereTemp.clear();
 		this.acheteurCourant = null;
 		this.objetCourant = this.listeObjets.pop();
 		this.listeAcheteurs.addAll(this.fileAttente);
 		this.fileAttente.clear();
 		this.etatVente = EtatVente.ENCHERISSEMENT;
+		this.objetCourant.setGagnant("");
 		
 		for(Acheteur each : this.listeAcheteurs){
 			each.objetVendu(null);
