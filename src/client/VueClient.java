@@ -160,7 +160,6 @@ public class VueClient extends JFrame implements ActionListener{
 		lblDescriptionObjet.setText(objet.getDescription());
 		txtEncherir.setText("");
 		
-		System.out.println(objet.isDisponible());
 		if (objet.isDisponible()) {
 			lblNomObjet.setText(objet.getNom() + "(disponible)");
 		}
@@ -280,8 +279,9 @@ public class VueClient extends JFrame implements ActionListener{
 		return attentePanel;
 	}
 
-	public static void main(String[] args) throws Exception {
-		new VueClient();
+	public JPanel getInscriptionPanel() {
+		return inscriptionPanel;
 	}
+
 
 }

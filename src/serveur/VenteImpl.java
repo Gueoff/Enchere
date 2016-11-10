@@ -22,6 +22,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	private Stack<Objet> listeObjets;
 	private Acheteur acheteurCourant;
 	private EtatVente etatVente;
+	private final int clientMin = 2;
 	
 	
 	protected VenteImpl() throws RemoteException {
@@ -46,7 +47,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		}			
 		this.fileAttente.add(acheteur);
 
-		if(this.fileAttente.size() >= 2 && (this.etatVente == EtatVente.ATTENTE || this.etatVente == EtatVente.TERMINE)){
+		if(this.fileAttente.size() >= clientMin && this.etatVente == EtatVente.ATTENTE){
 			this.etatVente = EtatVente.ENCHERISSEMENT;	
 			
 			for(Acheteur each : this.fileAttente){
@@ -63,46 +64,23 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	
 	@Override
 	public synchronized int rencherir(int nouveauPrix, Acheteur acheteur) throws Exception{
-		System.out.println("On recoit une enchere");
 		this.enchereTemp.put(acheteur, nouveauPrix);
-		
-		System.out.println("On est à "+this.enchereTemp.size()+" reponses sur "+this.listeAcheteurs.size());
+		System.out.println(this.enchereTemp.size()+"/"+this.listeAcheteurs.size());
 		
 		//On a recu toutes les encheres
 		if(this.enchereTemp.size() == this.listeAcheteurs.size()){
-			System.out.println("on a toutes les demandes");
-			
-			//Fin des encheres, on clean
 			if(fini()){
-				enchereSuivante();
+				objetSuivant();
 			}
-			
-			//On encheri sur le meme objet
 			else{
-				Set<Acheteur> cles = this.enchereTemp.keySet();
-				Iterator<Acheteur> it = cles.iterator();
+				actualiserObjet();
 				
-				while (it.hasNext()){
-					Acheteur cle = it.next();
-					Integer valeur = this.enchereTemp.get(cle);
-					
-					if(valeur > this.objetCourant.getPrixCourant() || (valeur == this.objetCourant.getPrixCourant() && cle.getChrono() < acheteurCourant.getChrono())){
-						this.objetCourant.setPrixCourant(valeur);
-						this.acheteurCourant = cle;	
-						this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
-				   }
-				}
-				
-				this.enchereTemp.clear();
 				//On renvoie le resultat du tour
 				for(Acheteur each : this.listeAcheteurs){
 					each.nouveauPrix(this.objetCourant.getPrixCourant(), this.acheteurCourant);
 				}
 			}
-		}else{
-			System.out.println("en attente de reponse...");
 		}
-		
 		return objetCourant.getPrixCourant();
 	}
 
@@ -112,28 +90,62 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	 * @throws RemoteException
 	 * @throws InterruptedException
 	 */
-	public void enchereSuivante() throws RemoteException, InterruptedException{
+	public void objetSuivant() throws RemoteException, InterruptedException{
 		this.enchereTemp.clear();
 		this.objetCourant.setDisponible(false);
-		this.etatVente = EtatVente.TERMINE;
+		this.etatVente = EtatVente.ATTENTE;
 		this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
 		
+		//Envoie des resultats finaux pour l'objet courant
 		for(Acheteur each : this.listeAcheteurs){
 			each.objetVendu(this.acheteurCourant.getPseudo());
 		}
 		
 		Thread.sleep(5000);
-		this.enchereTemp.clear();
+		//this.enchereTemp.clear();
 		this.acheteurCourant = null;
-		this.objetCourant = this.listeObjets.pop();
 		this.listeAcheteurs.addAll(this.fileAttente);
 		this.fileAttente.clear();
-		this.etatVente = EtatVente.ENCHERISSEMENT;
-		this.objetCourant.setGagnant("");
 		
-		for(Acheteur each : this.listeAcheteurs){
-			each.objetVendu(null);
+		//Il y a encore des objets à vendre
+		if(!this.listeObjets.isEmpty()){
+			this.objetCourant = this.listeObjets.pop();
+			this.objetCourant.setGagnant("");
+			this.etatVente = EtatVente.ENCHERISSEMENT;
+			for(Acheteur each : this.listeAcheteurs){
+				each.objetVendu(null);
+			}
+		} else{
+			this.etatVente = EtatVente.TERMINE;
+			for(Acheteur each : this.listeAcheteurs){
+				each.finEnchere();
+			}
 		}
+		
+		
+		
+	}
+	
+	/**
+	 * Methode utilitaire permettant d'actualiser le prix de l'objet et le gagnant selon les encheres recues.
+	 * @throws RemoteException
+	 */
+	public void actualiserObjet() throws RemoteException{
+		Set<Acheteur> cles = this.enchereTemp.keySet();
+		Iterator<Acheteur> it = cles.iterator();
+		
+		while (it.hasNext()){
+			Acheteur cle = it.next();
+			Integer valeur = this.enchereTemp.get(cle);
+			
+			if(valeur > this.objetCourant.getPrixCourant() || (valeur == this.objetCourant.getPrixCourant() && cle.getChrono() < acheteurCourant.getChrono())){
+				this.objetCourant.setPrixCourant(valeur);
+				this.acheteurCourant = cle;	
+				this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
+		   }
+		}
+		
+		this.enchereTemp.clear();
 	}
 	
 	

@@ -14,6 +14,8 @@ public interface Acheteur extends Remote {
 	public void objetVendu(String gagnant) throws RemoteException;
 
 	public void nouveauPrix(int prix, Acheteur gagnant) throws RemoteException;
+	
+	public void finEnchere() throws RemoteException;
 
 	public String getPseudo() throws RemoteException;
 

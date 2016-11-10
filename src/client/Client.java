@@ -48,7 +48,6 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 		if (prix <= this.currentObjet.getPrixCourant() && prix != -1) {
 			System.out.println("Prix trop bas, ne soyez pas radin !");
 		} else if (etat == EtatClient.RENCHERI) {
-			System.out.println("Vous rencherissez de " + prix + " euros.");
 			chrono.arreter();
 			vue.attente();
 			etat = EtatClient.ATTENTE;
@@ -74,10 +73,7 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 
 	@Override
 	public void nouveauPrix(int prix, Acheteur gagnant) throws RemoteException {
-		System.out.println("etat de "+this.pseudo + " : "+this.etat);
-		
 		try {
-			System.out.println(gagnant.getPseudo() + " a remporté la manche. Nouveau prix de  l'enchère : " + prix + " euros.");
 			this.currentObjet.setPrixCourant(prix);
 			this.currentObjet.setGagnant(gagnant.getPseudo());
 			this.vue.actualiserPrix();
@@ -88,6 +84,11 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 			e.printStackTrace();
 		}
 
+	}
+	
+	@Override
+	public void finEnchere() throws RemoteException {
+		System.exit(0);
 	}
 	
 	public void nouvelleSoumission(String nom, String description, int prix) {
@@ -103,13 +104,7 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 
 	public static void main(String[] argv) {
 		try {
-			Client c = new Client("Toto");
-			c.inscription();
-			System.out.println("En attente d'un deuxième client...");
-			while(c.getEtat() == EtatClient.ATTENTE) {System.out.print("");} // Attente de l'appel de objetVendu() du serveur
-			c.encherir(200);
-			while(c.getEtat() == EtatClient.ATTENTE) {System.out.print("");} // Attente de l'appel de nouveauPrix() du serveur
-			c.encherir(600);
+			new VueClient();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -145,4 +140,6 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	public String getPseudo() throws RemoteException {
 		return pseudo;
 	}
+
+
 }

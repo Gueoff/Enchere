@@ -23,8 +23,8 @@ public class Donnees {
 		Objet obj3 = new Objet("lit","un lit tout doux avec lequel on n'a pas envie de se lever le matin", 300);
 		
 		listeObjets.push(obj1);
-		listeObjets.push(obj2);
-		listeObjets.push(obj3);
+		//listeObjets.push(obj2);
+		//listeObjets.push(obj3);
 	}
 	
 	
