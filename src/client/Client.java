@@ -17,7 +17,7 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	private Vente serveur;
 	private Objet currentObjet;
 	private EtatClient etat = EtatClient.ATTENTE;
-	private Chrono chrono = new Chrono(30000, this); // Chrono de 30sc
+	private Chrono chrono = new Chrono(10000, this); // Chrono de 30sc
 
 	public Client(String pseudo) throws RemoteException {
 		super();
@@ -40,8 +40,9 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	}
 
 	public void inscription() throws Exception {
-		serveur.inscriptionAcheteur(pseudo, this);
-		//vue.changerGUI(this.vue.getAttentePanel());
+		if(!serveur.inscriptionAcheteur(pseudo, this)){
+			this.vue.attente();
+		}
 	}
 
 	public void encherir(int prix) throws RemoteException, Exception {		
@@ -61,14 +62,12 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 		this.vue.actualiserObjet();
 		this.vue.reprise();
 		
-		if (gagnant != null) {
-			this.vue.getLblEncherir().setText(gagnant + "a remporte l'enchère.");
-			this.etat = EtatClient.TERMINE;
-		}else{
+		if (gagnant != null) { //Fin de l'objet
+			this.etat = EtatClient.ATTENTE;
+		}else{ //inscription & objet suivant
 			this.etat = EtatClient.RENCHERI;
 			this.chrono.demarrer();
 		}
-		//this.vue.changerGUI(this.vue.getMainPanel());
 	}
 
 	@Override
@@ -88,6 +87,7 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 	
 	@Override
 	public void finEnchere() throws RemoteException {
+		this.etat = EtatClient.TERMINE;
 		System.exit(0);
 	}
 	
@@ -141,5 +141,8 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 		return pseudo;
 	}
 
+	public void updateChrono(){
+		this.vue.updateChrono(this.chrono.getTemps(), this.chrono.getTempsFin());
+	}
 
 }

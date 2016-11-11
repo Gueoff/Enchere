@@ -12,15 +12,17 @@ public class Chrono extends Thread {
 		client = c;
 	}
 	
+	
 	public void run() {
 		while(true) {
 			if(enCours) {
 				System.out.println("Début du chrono.");
 				tempsEcoule = 0;
-				while((tempsFin * 1000)>= tempsEcoule && enCours) {
+				while(tempsFin >= tempsEcoule && enCours) {
 					try {
 						sleep(1); // Attends 1ms
 						tempsEcoule++;
+						this.client.updateChrono();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -39,6 +41,9 @@ public class Chrono extends Thread {
 		}
 	}
 	
+
+
+	
 	public long getTemps() {
 		return tempsEcoule;
 	}
@@ -54,4 +59,9 @@ public class Chrono extends Thread {
 	public boolean getFini() {
 		return enCours;
 	}
+
+	public long getTempsFin() {
+		return tempsFin;
+	}	
+	
 }

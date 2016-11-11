@@ -27,20 +27,19 @@ public class VueClient extends JFrame implements ActionListener{
 	// Elements SWING
 	private JPanel mainPanel = new JPanel();
 	private JPanel inscriptionPanel = new JPanel();
-	private JPanel attentePanel = new JPanel();
 	
 	private JLabel lblPrixObjet = new JLabel();
 	private JLabel lblNomObjet = new JLabel();
 	private JLabel lblDescriptionObjet = new JLabel();
 	private JLabel lblPseudo = new JLabel();
 	private JLabel lblEncherir = new JLabel();
-	private JLabel lblAttente = new JLabel();
+	private JLabel lblChrono = new JLabel("chrono");
 
 	private JButton btnEncherir = new JButton("Encherir");
 	private JButton btnPseudo = new JButton("Inscription");
 	private JButton btnSoumettre = new JButton("Soumettre une enchere");
 	private JButton btnSoumettreObjet = new JButton("Soumettre");
-	private JButton btnStop = new JButton("Stop");
+	private JButton btnStop = new JButton("Passer");
 	
 	private JTextField txtEncherir = new JTextField();
 	private JTextField txtPseudo = new JTextField();
@@ -61,11 +60,7 @@ public class VueClient extends JFrame implements ActionListener{
 		this.setSize(800,400);
 		this.setTitle("Encheres2ouf");
 		Font fontBtn = new Font("Serif", Font.PLAIN, 10); // par exemple 
-		
-		//PANEL ATTENTE
-		lblAttente.setText("En attente d'une nouvelle enchère...");
-		attentePanel.add(lblAttente);
-		
+
 		// PANEL INSCRIPTION
 		inscriptionPanel.setLayout(new GridBagLayout());
 	    txtPseudo.setPreferredSize(new Dimension(400, 40));   
@@ -110,6 +105,9 @@ public class VueClient extends JFrame implements ActionListener{
 		gbc.gridx = 3;
 		mainPanel.add(lblPseudo, gbc);
 		
+		gbc.gridx = 4;
+		mainPanel.add(lblChrono, gbc);
+		
 		//2eme ligne
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -147,16 +145,15 @@ public class VueClient extends JFrame implements ActionListener{
 	}
 	
 	public void actualiserPrix() {
-		int prix = currentClient.getCurrentObjet().getPrixCourant();
-		lblPrixObjet.setText("Prix courant : " + prix + " euros");
-		lblPseudo.setText(this.currentClient.getCurrentObjet().getGagnant());
-		this.repaint();
+		lblPrixObjet.setText("Prix courant : " + currentClient.getCurrentObjet().getPrixCourant() + " euros");
+		lblPseudo.setText("Gagnant : " + this.currentClient.getCurrentObjet().getGagnant());
+		txtEncherir.setText("");
 	}
 	
 	public void actualiserObjet() {
 		Objet objet = currentClient.getCurrentObjet();
 		lblPrixObjet.setText("Prix courant : " + objet.getPrixCourant() + " euros");
-		lblPseudo.setText(this.currentClient.getCurrentObjet().getGagnant());
+		lblPseudo.setText("Gagnant : " + objet.getGagnant());
 		lblDescriptionObjet.setText(objet.getDescription());
 		txtEncherir.setText("");
 		
@@ -182,7 +179,6 @@ public class VueClient extends JFrame implements ActionListener{
 			if(!txtEncherir.getText().isEmpty()){
 				try {	
 					currentClient.encherir(Integer.parseInt(txtEncherir.getText()));
-					actualiserObjet();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -193,7 +189,6 @@ public class VueClient extends JFrame implements ActionListener{
 		else if(arg0.getSource().equals(this.btnStop)){
 			try {
 				currentClient.encherir(-1);
-				actualiserObjet();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -206,7 +201,6 @@ public class VueClient extends JFrame implements ActionListener{
 				setClient(new Client(txtPseudo.getText()));
 				currentClient.inscription();
 				changerGUI(this.mainPanel);
-				//changerGUI(this.attentePanel);
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.out.println("Inscription impossible");
@@ -275,12 +269,12 @@ public class VueClient extends JFrame implements ActionListener{
 		return mainPanel;
 	}
 
-	public JPanel getAttentePanel() {
-		return attentePanel;
-	}
-
 	public JPanel getInscriptionPanel() {
 		return inscriptionPanel;
+	}
+	
+	public void updateChrono(long temps, long tempsMax){
+		this.lblChrono.setText("Chrono : "+ temps+"/"+tempsMax);
 	}
 
 
