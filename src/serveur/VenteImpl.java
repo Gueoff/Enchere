@@ -68,7 +68,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		
 		//On a recu toutes les encheres
 		if(this.enchereTemp.size() == this.listeAcheteurs.size()){
-			if(fini()){
+			if(enchereFinie()){
 				return objetSuivant();
 			}
 			else{
@@ -90,22 +90,26 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	 */
 	public int objetSuivant() throws RemoteException, InterruptedException{
 		this.enchereTemp.clear();
-		this.objetCourant.setDisponible(false);
 		this.etatVente = EtatVente.ATTENTE;
-		this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
 		
-		//Envoie des resultats finaux pour l'objet courant
-		for(Acheteur each : this.listeAcheteurs){
-			each.objetVendu(this.acheteurCourant.getPseudo());
+		if(acheteurCourant != null){
+			this.objetCourant.setDisponible(false);
+			this.objetCourant.setGagnant(this.acheteurCourant.getPseudo());
+			
+			//Envoie des resultats finaux pour l'objet courant
+			for(Acheteur each : this.listeAcheteurs){
+				each.objetVendu(this.acheteurCourant.getPseudo());
+				
+			}
 		}
+		
 		
 
 		Thread.sleep(5000);
-		//this.enchereTemp.clear();
 		this.acheteurCourant = null;
 		this.listeAcheteurs.addAll(this.fileAttente);
 		this.fileAttente.clear();
-		
+
 		//Il y a encore des objets à vendre
 		if(!this.listeObjets.isEmpty()){
 			this.objetCourant = this.listeObjets.pop();
@@ -123,6 +127,8 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		}
 		return this.objetCourant.getPrixBase();
 	}
+	
+	
 	
 	/**
 	 * Methode utilitaire permettant d'actualiser le prix de l'objet et le gagnant selon les encheres recues.
@@ -150,7 +156,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 	 * méthode utilitaire qui permet de savoir si les encheres sont finis.
 	 * @return true si on a reçu que des -1, donc si l'enchere est finie, sinon false.
 	 */
-	public boolean fini(){	
+	public boolean enchereFinie(){	
 		Set<Acheteur> cles = this.enchereTemp.keySet();
 		Iterator<Acheteur> it = cles.iterator();
 		
@@ -165,13 +171,7 @@ public class VenteImpl extends UnicastRemoteObject implements Vente{
 		return true;
 	}
 	
-	
-	@Override
-	public int tempsEcoule(Acheteur acheteur) throws RemoteException {
-		//long chrono = acheteur.getChrono();
-		
-		return 0;
-	}
+
 
 	@Override
 	public void ajouterObjet(Objet objet) throws RemoteException {

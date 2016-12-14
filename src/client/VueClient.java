@@ -58,8 +58,8 @@ public class VueClient extends JFrame implements ActionListener{
 
 		//Definition de la fenetre
 		this.setSize(800,400);
-		this.setTitle("Encheres2ouf");
-		Font fontBtn = new Font("Serif", Font.PLAIN, 10); // par exemple 
+		this.setTitle("Vente aux encheres");
+		Font fontBtn = new Font("Serif", Font.PLAIN, 10);
 
 		// PANEL INSCRIPTION
 		inscriptionPanel.setLayout(new GridBagLayout());
@@ -215,7 +215,7 @@ public class VueClient extends JFrame implements ActionListener{
 			try {
 				currentClient.nouvelleSoumission(txtSoumettreNomObjet.getText(), txtSoumettreDescriptionObjet.getText(), Integer.parseInt(txtSoumettrePrixObjet.getText()));
 			} catch (NumberFormatException e) {
-				System.out.println("Impossible de faire la soumettre cet objet.");
+				System.out.println("Impossible de soumettre cet objet.");
 			}
 			frmSoumettre.dispose();
 		}

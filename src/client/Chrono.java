@@ -16,7 +16,6 @@ public class Chrono extends Thread {
 	public void run() {
 		while(true) {
 			if(enCours) {
-				System.out.println("Début du chrono.");
 				tempsEcoule = 0;
 				while(tempsFin >= tempsEcoule && enCours) {
 					try {
@@ -27,7 +26,7 @@ public class Chrono extends Thread {
 						e.printStackTrace();
 					}
 				}
-				System.out.println("Fin du chrono.");
+				
 				if(enCours) {
 					try {
 						client.encherir(-1);
@@ -35,9 +34,8 @@ public class Chrono extends Thread {
 						e.printStackTrace();
 					}
 				}
-				enCours = false;
 			}
-			System.out.print(""); // A mettre apparemment, histoire des boucles vides. Comprends pas.
+			System.out.print("");
 		}
 	}
 	

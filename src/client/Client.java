@@ -97,7 +97,6 @@ public class Client extends UnicastRemoteObject implements Acheteur {
 			serveur.ajouterObjet(nouveau);
 			System.out.println("Soumission de l'objet " + nom + " au serveur.");
 		} catch (RemoteException e) {
-			System.out.println("Impossible de soumettre un nouvel objet.");
 			e.printStackTrace();
 		}
 	}

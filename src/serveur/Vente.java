@@ -24,14 +24,6 @@ public interface Vente extends Remote {
 	 */
 	public int rencherir(int nouveauPrix, Acheteur acheteur) throws RemoteException, Exception;
 	
-	/**
-	 * je sais pas
-	 * @param acheteur
-	 * @return
-	 * @throws RemoteException
-	 */
-	public int tempsEcoule(Acheteur acheteur) throws RemoteException, Exception;
-	
 
 	/**
 	 * Methode permettant d ajouter un objet aux encheres.
